@@ -10,8 +10,8 @@ import { Lock, ArrowRight, ShieldCheck, CheckCircle, MessageCircle, RefreshCw, X
 
 // CONFIGURAÇÕES GERAIS - AJUSTE AQUI SE NECESSÁRIO
 const CHECKOUT_URL = "https://go.ironpayapp.com.br/vwtyajrg8t";
-const WHATSAPP_NUMBER = "5500000000000"; // COLOQUE SEU WHATSAPP AQUI (DDD + NÚMERO)
-const AUTH_TOKEN = "sucesso_patriota_2026"; // CHAVE SECRETA PARA O REDIRECIONAMENTO
+const WHATSAPP_NUMBER = "5542933006492"; 
+const AUTH_TOKEN = "sucesso_patriota_2026"; 
 
 const SUPPORT_MESSAGE = encodeURIComponent("Olá! Fiz o pagamento no portal mas não fui redirecionado automaticamente. Preciso de ajuda.");
 const SUPPORT_WHATSAPP = `https://wa.me/${WHATSAPP_NUMBER}?text=${SUPPORT_MESSAGE}`;
@@ -34,13 +34,13 @@ const App: React.FC = () => {
   ];
 
   useEffect(() => {
-    // 1. Verifica se já possui acesso salvo no navegador
+    // 1. Verifica acesso salvo
     const access = localStorage.getItem('patriota_access_vfinal');
     if (access === 'verified') {
       setIsAuthorized(true);
     }
 
-    // 2. Verifica se o usuário acabou de vir da IronPay com o segredo
+    // 2. Verifica redirecionamento da IronPay
     const params = new URLSearchParams(window.location.search);
     if (params.get('auth') === AUTH_TOKEN) {
       startProcessingFlow();
@@ -68,7 +68,6 @@ const App: React.FC = () => {
     setActiveTab('portal');
     setShowSuccessToast(true);
     
-    // Limpa a URL para esconder o token
     window.history.replaceState({}, document.title, window.location.pathname);
     setTimeout(() => setShowSuccessToast(false), 8000);
   };
@@ -84,7 +83,6 @@ const App: React.FC = () => {
     }, 3000);
   };
 
-  // PÁGINA DE PROCESSAMENTO (PÓS-CHECKOUT)
   if (isProcessingAccess) {
     return (
       <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center overflow-hidden">
