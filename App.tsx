@@ -8,16 +8,10 @@ import { Footer } from './components/Footer';
 import { Portal } from './components/Portal';
 import { Lock, ArrowRight, ShieldCheck, CheckCircle, MessageCircle, RefreshCw, X, Shield, Cpu, Database, Globe, AlertCircle } from 'lucide-react';
 
-// CONFIGURAÇÕES GERAIS - AJUSTE AQUI
+// CONFIGURAÇÕES GERAIS
 const CHECKOUT_URL = "https://go.ironpayapp.com.br/vwtyajrg8t";
-const WHATSAPP_NUMBER = "5542933006492"; 
 const AUTH_TOKEN = "sucesso_patriota_2026"; 
-
-// E-mail que sempre terá acesso (seu acesso pessoal)
 const MASTER_EMAIL = "admin@patriota.com"; 
-
-const SUPPORT_MESSAGE = encodeURIComponent("Olá! Fiz o pagamento no portal mas não fui redirecionado automaticamente. Preciso de ajuda para validar meu e-mail.");
-const SUPPORT_WHATSAPP = `https://wa.me/${WHATSAPP_NUMBER}?text=${SUPPORT_MESSAGE}`;
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -69,51 +63,42 @@ const App: React.FC = () => {
     setIsProcessingAccess(false);
     setActiveTab('portal');
     setShowSuccessToast(true);
+    setTimeout(() => setShowSuccessToast(false), 8000);
     
     try {
       if (window.history && window.history.replaceState) {
         window.history.replaceState({}, document.title, window.location.pathname);
       }
-    } catch (e) {
-      console.warn("URL cleanup restricted.", e);
-    }
-    
-    setTimeout(() => setShowSuccessToast(false), 8000);
+    } catch (e) {}
   };
 
   const handleLogout = () => {
     localStorage.removeItem('patriota_access_vfinal');
     setIsAuthorized(false);
     setActiveTab('home');
-    setTimeout(() => {
-      window.scrollTo(0, 0);
-    }, 100);
+    window.scrollTo(0, 0);
   };
 
   const handleManualVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    // Verifica se o e-mail contém o domínio ou a chave secreta conforme solicitado
-    if (!emailToVerify.includes('@') && !emailToVerify.toLowerCase().includes('vip2026')) return;
-    
     setVerificationError('');
     setVerifying(true);
 
     setTimeout(() => {
       setVerifying(false);
-      const emailLower = emailToVerify.toLowerCase();
+      const inputLower = emailToVerify.toLowerCase();
       
-      // MANTENDO A CHAVE SECRETA (vip2026) PARA ACESSO FÁCIL
+      // LÓGICA DE ACESSO: MASTER_EMAIL ou conter a chave secreta vip2026
       if (
-        emailLower === MASTER_EMAIL.toLowerCase() || 
-        emailLower.includes('vip2026') || 
-        emailLower === 'patriota@2026'
+        inputLower === MASTER_EMAIL.toLowerCase() || 
+        inputLower.includes('vip2026')
       ) {
         setShowValidationModal(false);
         finalizeAccess();
       } else {
         setVerificationError('Acesso não encontrado. Verifique seu e-mail da IronPay.');
       }
-    }, 2500);
+    }, 1500);
   };
 
   if (isProcessingAccess) {
@@ -159,30 +144,62 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {/* MODAL DE VALIDAÇÃO IDENTICO À IMAGEM */}
       {showValidationModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-blue-950/98 backdrop-blur-2xl">
-          <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-white/20 animate-in zoom-in duration-300">
-            <div className="bg-patriotic-gradient p-10 text-white relative">
-              <button onClick={() => setShowValidationModal(false)} className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"><X size={20} /></button>
-              <div className="flex items-center gap-3 mb-4">
-                <ShieldCheck size={32} className="text-yellow-400" />
-                <h3 className="text-2xl font-black uppercase italic tracking-tighter">Validar Membro</h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-[3.5rem] shadow-[0_30px_80px_rgba(0,0,0,0.2)] w-full max-w-md overflow-hidden relative animate-in zoom-in duration-300">
+            {/* Cabeçalho Gradiente */}
+            <div className="bg-gradient-to-br from-[#004bbd] to-[#009b3a] pt-14 pb-12 px-10 text-white relative">
+              {/* Botão Fechar Verde circular */}
+              <button 
+                onClick={() => setShowValidationModal(false)} 
+                className="absolute top-6 right-6 w-10 h-10 bg-[#2ea451] flex items-center justify-center rounded-full text-white hover:bg-green-600 transition-colors shadow-lg"
+              >
+                <X size={20} strokeWidth={3} />
+              </button>
+              
+              <div className="flex items-center gap-4">
+                <div className="text-[#fbbf24]">
+                  <ShieldCheck size={42} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-[2.2rem] font-black uppercase italic tracking-tighter leading-none">
+                  VALIDAR MEMBRO
+                </h3>
               </div>
             </div>
+
+            {/* Formulário */}
             <div className="p-12">
-              <form onSubmit={handleManualVerify} className="space-y-4">
-                <p className="text-slate-500 text-xs font-bold uppercase mb-2">Insira seu e-mail de compra:</p>
-                <input 
-                  type="text" 
-                  required 
-                  autoFocus 
-                  value={emailToVerify} 
-                  onChange={(e) => setEmailToVerify(e.target.value)} 
-                  placeholder="Seu e-mail..." 
-                  className={`w-full px-6 py-5 rounded-2xl border-2 outline-none transition-all text-lg font-bold ${verificationError ? 'border-red-500 bg-red-50' : 'border-slate-100 focus:border-blue-600'}`}
-                />
-                {verificationError && <div className="mt-2 text-red-600 text-xs font-bold flex items-center gap-2"><AlertCircle size={14} /> {verificationError}</div>}
-                <button disabled={verifying} className="w-full py-6 bg-blue-600 text-white font-black rounded-2xl shadow-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-3 disabled:opacity-50 text-xl uppercase tracking-tighter italic">
+              <form onSubmit={handleManualVerify} className="space-y-6">
+                <div>
+                  <p className="text-[#8e99ab] text-[11px] font-black uppercase tracking-widest mb-4">
+                    INSIRE SEU E-MAIL DE COMPRA:
+                  </p>
+                  <input 
+                    type="text" 
+                    required 
+                    autoFocus 
+                    value={emailToVerify} 
+                    onChange={(e) => setEmailToVerify(e.target.value)} 
+                    placeholder="exemplo@gmail.com" 
+                    className={`w-full px-8 py-6 rounded-[1.5rem] border-2 outline-none transition-all text-2xl font-bold ${
+                      verificationError 
+                        ? 'border-[#ef4444] bg-[#fef2f2] text-[#1e293b]' 
+                        : 'border-[#e2e8f0] focus:border-[#2563eb] text-[#1e293b]'
+                    }`}
+                  />
+                  {verificationError && (
+                    <div className="mt-4 text-[#dc2626] text-[13px] font-bold flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full border border-[#dc2626] flex items-center justify-center text-[10px] font-black">!</div>
+                      {verificationError}
+                    </div>
+                  )}
+                </div>
+
+                <button 
+                  disabled={verifying} 
+                  className="w-full py-7 bg-[#2563eb] text-white font-black rounded-[1.5rem] shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 text-2xl uppercase tracking-tighter italic"
+                >
                   {verifying ? <RefreshCw className="animate-spin" /> : "LIBERAR MEU ACESSO"}
                 </button>
               </form>
@@ -200,29 +217,32 @@ const App: React.FC = () => {
             <Portal onLogout={handleLogout} />
           ) : (
             <div className="min-h-[90vh] flex items-center justify-center px-4 py-16 bg-[#f8fafc]">
-              <div className="max-w-[440px] w-full bg-white rounded-[3.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
-                {/* Header Gradient conforme mockup */}
-                <div className="bg-patriotic-gradient pt-16 pb-12 text-center text-white relative flex flex-col items-center">
-                  <div className="mb-8 p-1">
-                    <Lock size={72} strokeWidth={1.5} className="text-white" />
+              <div className="max-w-[440px] w-full bg-white rounded-[4rem] shadow-[0_40px_100px_-15px_rgba(0,0,0,0.15)] overflow-hidden">
+                {/* Header conforme mockup 1 */}
+                <div className="bg-patriotic-gradient pt-20 pb-14 text-center text-white relative flex flex-col items-center">
+                  <div className="mb-8">
+                    <Lock size={84} strokeWidth={1.5} className="text-white" />
                   </div>
-                  <h2 className="text-4xl font-black uppercase tracking-tighter italic leading-none">
+                  <h2 className="text-[2.8rem] font-black uppercase tracking-tighter italic leading-none">
                     PORTAL VIP
                   </h2>
                 </div>
                 
-                {/* Content Area centralizada conforme mockup */}
-                <div className="pt-24 pb-16 px-10 text-center flex flex-col items-center">
+                {/* Content Area */}
+                <div className="pt-24 pb-20 px-12 text-center flex flex-col items-center">
                   <button 
                     onClick={() => window.location.href = CHECKOUT_URL} 
-                    className="w-full py-7 bg-[#10a54a] text-white font-black rounded-[1.8rem] shadow-lg shadow-green-100 hover:bg-green-600 hover:-translate-y-1 transition-all text-lg uppercase italic tracking-tighter"
+                    className="w-full py-8 bg-[#10a54a] text-white font-black rounded-[2rem] shadow-[0_15px_30px_rgba(16,165,74,0.2)] hover:bg-green-600 hover:-translate-y-1 transition-all text-xl uppercase italic tracking-tighter"
                   >
                     QUERO MEU ACESSO
                   </button>
                   
                   <button 
-                    onClick={() => setShowValidationModal(true)} 
-                    className="mt-8 text-slate-400 font-bold uppercase text-[11px] tracking-wider hover:text-blue-600 transition-colors"
+                    onClick={() => {
+                      setVerificationError('');
+                      setShowValidationModal(true);
+                    }} 
+                    className="mt-10 text-slate-400 font-bold uppercase text-[12px] tracking-[0.15em] hover:text-blue-600 transition-colors"
                   >
                     JÁ SOU MEMBRO? VALIDAR
                   </button>
@@ -232,7 +252,7 @@ const App: React.FC = () => {
           )
         )}
 
-        {activeTab === 'sobre' && <div className="py-24 px-4 max-w-5xl mx-auto text-center"><h1 className="text-6xl font-black mb-6 text-blue-950 uppercase italic tracking-tighter">Nossa Bandeira</h1><p className="text-xl text-slate-600 max-w-2xl mx-auto">Movimento independente focado na transparência e no futuro do Brasil.</p></div>}
+        {activeTab === 'sobre' && <div className="py-24 px-4 max-w-5xl mx-auto text-center"><h1 className="text-6xl font-black mb-6 text-blue-950 uppercase italic tracking-tighter">Nossa Bandeira</h1></div>}
       </main>
       <Footer />
     </div>
