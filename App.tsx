@@ -9,9 +9,10 @@ import { Portal } from './components/Portal';
 import { Lock, ArrowRight, ShieldCheck, CheckCircle, MessageCircle, RefreshCw, X, Shield, Cpu, Database, Globe, AlertCircle } from 'lucide-react';
 
 // CONFIGURAÇÕES GERAIS
-const CHECKOUT_URL = "https://go.ironpayapp.com.br/vwtyajrg8t";
+const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818";
 const AUTH_TOKEN = "sucesso_patriota_2026"; 
 const MASTER_EMAIL = "admin@patriota.com"; 
+const WHATSAPP_SUPPORT_URL = "https://wa.me/5542933006492?text=Olá,%20sou%20membro%20VIP%20do%20Portal%20Patriota%20e%20preciso%20de%20suporte.";
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -25,7 +26,7 @@ const App: React.FC = () => {
   const [verificationError, setVerificationError] = useState('');
 
   const processingMessages = [
-    "Conectando aos servidores da IronPay...",
+    "Conectando aos servidores de pagamento...",
     "Validando autenticidade da transação...",
     "Sincronizando banco de dados patriota...",
     "Liberando acesso vitalício ao Portal VIP..."
@@ -88,7 +89,6 @@ const App: React.FC = () => {
       setVerifying(false);
       const inputLower = emailToVerify.toLowerCase();
       
-      // LÓGICA DE ACESSO: MASTER_EMAIL ou conter a chave secreta vip2026
       if (
         inputLower === MASTER_EMAIL.toLowerCase() || 
         inputLower.includes('vip2026')
@@ -96,7 +96,7 @@ const App: React.FC = () => {
         setShowValidationModal(false);
         finalizeAccess();
       } else {
-        setVerificationError('Acesso não encontrado. Verifique seu e-mail da IronPay.');
+        setVerificationError('Acesso não encontrado para este e-mail. Verifique os dados da sua compra.');
       }
     }, 1500);
   };
@@ -144,13 +144,10 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL DE VALIDAÇÃO IDENTICO À IMAGEM */}
       {showValidationModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-[3.5rem] shadow-[0_30px_80px_rgba(0,0,0,0.2)] w-full max-w-md overflow-hidden relative animate-in zoom-in duration-300">
-            {/* Cabeçalho Gradiente */}
             <div className="bg-gradient-to-br from-[#004bbd] to-[#009b3a] pt-14 pb-12 px-10 text-white relative">
-              {/* Botão Fechar Verde circular */}
               <button 
                 onClick={() => setShowValidationModal(false)} 
                 className="absolute top-6 right-6 w-10 h-10 bg-[#2ea451] flex items-center justify-center rounded-full text-white hover:bg-green-600 transition-colors shadow-lg"
@@ -168,7 +165,6 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Formulário */}
             <div className="p-12">
               <form onSubmit={handleManualVerify} className="space-y-6">
                 <div>
@@ -216,23 +212,21 @@ const App: React.FC = () => {
           isAuthorized ? (
             <Portal onLogout={handleLogout} />
           ) : (
-            <div className="min-h-[90vh] flex items-center justify-center px-4 py-16 bg-[#f8fafc]">
-              <div className="max-w-[440px] w-full bg-white rounded-[4rem] shadow-[0_40px_100px_-15px_rgba(0,0,0,0.15)] overflow-hidden">
-                {/* Header conforme mockup 1 */}
-                <div className="bg-patriotic-gradient pt-20 pb-14 text-center text-white relative flex flex-col items-center">
-                  <div className="mb-8">
-                    <Lock size={84} strokeWidth={1.5} className="text-white" />
+            <div className="min-h-[80vh] flex items-center justify-center px-4 py-8 bg-[#f8fafc]">
+              <div className="max-w-[320px] w-full bg-white rounded-[2.5rem] shadow-[0_30px_70px_-10px_rgba(0,0,0,0.1)] overflow-hidden">
+                <div className="bg-patriotic-gradient pt-10 pb-8 text-center text-white relative flex flex-col items-center">
+                  <div className="mb-4">
+                    <Lock size={48} strokeWidth={1.5} className="text-white" />
                   </div>
-                  <h2 className="text-[2.8rem] font-black uppercase tracking-tighter italic leading-none">
+                  <h2 className="text-[1.8rem] font-black uppercase tracking-tighter italic leading-none">
                     PORTAL VIP
                   </h2>
                 </div>
                 
-                {/* Content Area */}
-                <div className="pt-24 pb-20 px-12 text-center flex flex-col items-center">
+                <div className="pt-12 pb-10 px-8 text-center flex flex-col items-center">
                   <button 
                     onClick={() => window.location.href = CHECKOUT_URL} 
-                    className="w-full py-8 bg-[#10a54a] text-white font-black rounded-[2rem] shadow-[0_15px_30px_rgba(16,165,74,0.2)] hover:bg-green-600 hover:-translate-y-1 transition-all text-xl uppercase italic tracking-tighter"
+                    className="w-full py-5 bg-[#10a54a] text-white font-black rounded-[1.2rem] shadow-[0_8px_20px_rgba(16,165,74,0.1)] hover:bg-green-600 hover:-translate-y-0.5 transition-all text-base uppercase italic tracking-tighter"
                   >
                     QUERO MEU ACESSO
                   </button>
@@ -242,10 +236,21 @@ const App: React.FC = () => {
                       setVerificationError('');
                       setShowValidationModal(true);
                     }} 
-                    className="mt-10 text-slate-400 font-bold uppercase text-[12px] tracking-[0.15em] hover:text-blue-600 transition-colors"
+                    className="mt-6 text-slate-400 font-bold uppercase text-[10px] tracking-[0.1em] hover:text-blue-600 transition-colors"
                   >
                     JÁ SOU MEMBRO? VALIDAR
                   </button>
+
+                  <div className="mt-8 pt-6 border-t border-slate-50 w-full">
+                    <a 
+                      href={WHATSAPP_SUPPORT_URL} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-full font-black text-[9px] uppercase tracking-widest transition-all"
+                    >
+                      <MessageCircle size={12} /> SUPORTE
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

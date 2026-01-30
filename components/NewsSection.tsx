@@ -2,7 +2,7 @@
 import React from 'react';
 import { Calendar, ChevronRight } from 'lucide-react';
 
-const CHECKOUT_URL = "https://go.ironpayapp.com.br/vwtyajrg8t";
+const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818";
 
 const NEWS_DATA = [
   {

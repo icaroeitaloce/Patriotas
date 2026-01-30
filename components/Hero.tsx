@@ -2,7 +2,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
-const CHECKOUT_URL = "https://go.ironpayapp.com.br/vwtyajrg8t";
+const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818";
 
 export const Hero: React.FC = () => {
   const handleCheckout = () => {

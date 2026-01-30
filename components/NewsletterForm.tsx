@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Send, Mail, User, ShieldCheck } from 'lucide-react';
 
-const CHECKOUT_URL = "https://go.ironpayapp.com.br/vwtyajrg8t";
+const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818";
 
 export const NewsletterForm: React.FC = () => {
   const [email, setEmail] = useState('');
