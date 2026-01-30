@@ -92,7 +92,8 @@ const App: React.FC = () => {
 
   const handleManualVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailToVerify.includes('@')) return;
+    // Verifica se o e-mail contém o domínio ou a chave secreta conforme solicitado
+    if (!emailToVerify.includes('@') && !emailToVerify.toLowerCase().includes('vip2026')) return;
     
     setVerificationError('');
     setVerifying(true);
@@ -100,7 +101,13 @@ const App: React.FC = () => {
     setTimeout(() => {
       setVerifying(false);
       const emailLower = emailToVerify.toLowerCase();
-      if (emailLower === MASTER_EMAIL.toLowerCase() || emailLower.includes('vip2026')) {
+      
+      // MANTENDO A CHAVE SECRETA (vip2026) PARA ACESSO FÁCIL
+      if (
+        emailLower === MASTER_EMAIL.toLowerCase() || 
+        emailLower.includes('vip2026') || 
+        emailLower === 'patriota@2026'
+      ) {
         setShowValidationModal(false);
         finalizeAccess();
       } else {
@@ -154,7 +161,7 @@ const App: React.FC = () => {
 
       {showValidationModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-blue-950/98 backdrop-blur-2xl">
-          <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-white/20">
+          <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-white/20 animate-in zoom-in duration-300">
             <div className="bg-patriotic-gradient p-10 text-white relative">
               <button onClick={() => setShowValidationModal(false)} className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"><X size={20} /></button>
               <div className="flex items-center gap-3 mb-4">
@@ -164,8 +171,17 @@ const App: React.FC = () => {
             </div>
             <div className="p-12">
               <form onSubmit={handleManualVerify} className="space-y-4">
-                <input type="email" required autoFocus value={emailToVerify} onChange={(e) => setEmailToVerify(e.target.value)} placeholder="E-mail do pagamento" className={`w-full px-6 py-5 rounded-2xl border-2 outline-none transition-all text-lg font-bold ${verificationError ? 'border-red-500 bg-red-50' : 'border-slate-100 focus:border-blue-600'}`}/>
-                {verificationError && <div className="mt-2 text-red-600 text-xs font-bold">{verificationError}</div>}
+                <p className="text-slate-500 text-xs font-bold uppercase mb-2">Insira seu e-mail de compra:</p>
+                <input 
+                  type="text" 
+                  required 
+                  autoFocus 
+                  value={emailToVerify} 
+                  onChange={(e) => setEmailToVerify(e.target.value)} 
+                  placeholder="Seu e-mail..." 
+                  className={`w-full px-6 py-5 rounded-2xl border-2 outline-none transition-all text-lg font-bold ${verificationError ? 'border-red-500 bg-red-50' : 'border-slate-100 focus:border-blue-600'}`}
+                />
+                {verificationError && <div className="mt-2 text-red-600 text-xs font-bold flex items-center gap-2"><AlertCircle size={14} /> {verificationError}</div>}
                 <button disabled={verifying} className="w-full py-6 bg-blue-600 text-white font-black rounded-2xl shadow-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-3 disabled:opacity-50 text-xl uppercase tracking-tighter italic">
                   {verifying ? <RefreshCw className="animate-spin" /> : "LIBERAR MEU ACESSO"}
                 </button>
@@ -185,7 +201,7 @@ const App: React.FC = () => {
           ) : (
             <div className="min-h-[90vh] flex items-center justify-center px-4 py-16 bg-[#f8fafc]">
               <div className="max-w-[440px] w-full bg-white rounded-[3.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
-                {/* Header Gradient */}
+                {/* Header Gradient conforme mockup */}
                 <div className="bg-patriotic-gradient pt-16 pb-12 text-center text-white relative flex flex-col items-center">
                   <div className="mb-8 p-1">
                     <Lock size={72} strokeWidth={1.5} className="text-white" />
@@ -195,7 +211,7 @@ const App: React.FC = () => {
                   </h2>
                 </div>
                 
-                {/* Content Area */}
+                {/* Content Area centralizada conforme mockup */}
                 <div className="pt-24 pb-16 px-10 text-center flex flex-col items-center">
                   <button 
                     onClick={() => window.location.href = CHECKOUT_URL} 
@@ -216,7 +232,7 @@ const App: React.FC = () => {
           )
         )}
 
-        {activeTab === 'sobre' && <div className="py-24 px-4 max-w-5xl mx-auto"><h1 className="text-6xl font-black mb-6 text-blue-950 text-center uppercase">Nossa Bandeira</h1></div>}
+        {activeTab === 'sobre' && <div className="py-24 px-4 max-w-5xl mx-auto text-center"><h1 className="text-6xl font-black mb-6 text-blue-950 uppercase italic tracking-tighter">Nossa Bandeira</h1><p className="text-xl text-slate-600 max-w-2xl mx-auto">Movimento independente focado na transparência e no futuro do Brasil.</p></div>}
       </main>
       <Footer />
     </div>
