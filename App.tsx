@@ -12,6 +12,14 @@ import { Lock, ArrowRight, ShieldCheck, CheckCircle, MessageCircle, RefreshCw, X
 const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818";
 const AUTH_TOKEN = "sucesso_patriota_2026"; 
 const MASTER_EMAIL = "admin@patriota.com"; 
+
+// LISTA DE E-MAILS LIBERADOS (Fixos para testes e parcerias)
+const WHITELIST_EMAILS = [
+  "icaroeitaloce@gmail.com",
+  "suporte@patriota.com",
+  "contato@direitabrasil.com"
+];
+
 const WHATSAPP_SUPPORT_URL = "https://wa.me/5542933006492?text=Olá,%20sou%20membro%20VIP%20do%20Portal%20Patriota%20e%20preciso%20de%20suporte.";
 
 const App: React.FC = () => {
@@ -26,20 +34,33 @@ const App: React.FC = () => {
   const [verificationError, setVerificationError] = useState('');
 
   const processingMessages = [
-    "Conectando aos servidores de pagamento...",
-    "Validando autenticidade da transação...",
-    "Sincronizando banco de dados patriota...",
-    "Liberando acesso vitalício ao Portal VIP..."
+    "Sincronizando com a plataforma de pagamento...",
+    "Validando e-mail na base de dados VIP...",
+    "Configurando criptografia de acesso vitalício...",
+    "Liberando Central de Inteligência Patriota..."
   ];
 
   useEffect(() => {
+    // 1. Verifica se já tem acesso mestre salvo
     const access = localStorage.getItem('patriota_access_vfinal');
     if (access === 'verified') {
       setIsAuthorized(true);
     }
 
+    // 2. Lógica de Redirecionamento Automático Pós-Pagamento (Captura E-mail)
     const params = new URLSearchParams(window.location.search);
-    if (params.get('auth') === AUTH_TOKEN) {
+    const hasAuth = params.get('auth') === AUTH_TOKEN;
+    const clientEmail = params.get('email');
+
+    if (hasAuth) {
+      if (clientEmail) {
+        // Registra o e-mail do comprador na lista local de autorizados
+        const savedEmails = JSON.parse(localStorage.getItem('patriota_authorized_list') || '[]');
+        if (!savedEmails.includes(clientEmail.toLowerCase())) {
+          savedEmails.push(clientEmail.toLowerCase());
+          localStorage.setItem('patriota_authorized_list', JSON.stringify(savedEmails));
+        }
+      }
       startProcessingFlow();
     }
   }, []);
@@ -55,7 +76,7 @@ const App: React.FC = () => {
         clearInterval(interval);
         finalizeAccess();
       }
-    }, 1500);
+    }, 1200);
   };
 
   const finalizeAccess = () => {
@@ -66,6 +87,7 @@ const App: React.FC = () => {
     setShowSuccessToast(true);
     setTimeout(() => setShowSuccessToast(false), 8000);
     
+    // Limpa a URL para o token e e-mail não ficarem visíveis
     try {
       if (window.history && window.history.replaceState) {
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -87,18 +109,23 @@ const App: React.FC = () => {
 
     setTimeout(() => {
       setVerifying(false);
-      const inputLower = emailToVerify.toLowerCase();
+      const inputLower = emailToVerify.trim().toLowerCase();
       
-      if (
-        inputLower === MASTER_EMAIL.toLowerCase() || 
-        inputLower.includes('vip2026')
-      ) {
+      // Busca na lista dinâmica de e-mails que já passaram pelo checkout neste navegador
+      const dynamicList = JSON.parse(localStorage.getItem('patriota_authorized_list') || '[]');
+      
+      const isMaster = inputLower === MASTER_EMAIL.toLowerCase();
+      const isWhitelisted = WHITELIST_EMAILS.some(e => e.toLowerCase() === inputLower);
+      const isDynamicAuthorized = dynamicList.includes(inputLower);
+      const hasSecretKey = inputLower.includes('vip2026');
+
+      if (isMaster || isWhitelisted || isDynamicAuthorized || hasSecretKey) {
         setShowValidationModal(false);
         finalizeAccess();
       } else {
-        setVerificationError('Acesso não encontrado para este e-mail. Verifique os dados da sua compra.');
+        setVerificationError('E-mail não autorizado. Use o mesmo e-mail da compra ou fale com o suporte.');
       }
-    }, 1500);
+    }, 1800);
   };
 
   if (isProcessingAccess) {
@@ -112,7 +139,7 @@ const App: React.FC = () => {
                 <Shield size={80} className="text-yellow-500 animate-[bounce_2s_infinite]" />
              </div>
           </div>
-          <h2 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-2">Processando Acesso</h2>
+          <h2 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-2">Liberando Acesso</h2>
           <div className="space-y-6 text-left mt-8">
             {processingMessages.map((msg, idx) => (
               <div key={idx} className={`flex items-center gap-4 transition-all duration-500 ${idx <= processStep ? 'opacity-100' : 'opacity-20'}`}>
@@ -137,8 +164,8 @@ const App: React.FC = () => {
           <div className="bg-green-600 text-white px-8 py-5 rounded-3xl shadow-2xl flex items-center gap-4 border-2 border-green-400/50 backdrop-blur-md">
             <div className="bg-white p-2 rounded-full text-green-600"><ShieldCheck size={28} /></div>
             <div>
-              <p className="font-black uppercase text-lg tracking-tighter italic">PAGAMENTO CONFIRMADO!</p>
-              <p className="text-xs text-green-100 font-bold opacity-80 uppercase tracking-widest text-glow">Acesso VIP liberado.</p>
+              <p className="font-black uppercase text-lg tracking-tighter italic">ACESSO VIP CONFIRMADO!</p>
+              <p className="text-xs text-green-100 font-bold opacity-80 uppercase tracking-widest text-glow">Seja bem-vindo, Patriota.</p>
             </div>
           </div>
         </div>
@@ -160,7 +187,7 @@ const App: React.FC = () => {
                   <ShieldCheck size={42} strokeWidth={2.5} />
                 </div>
                 <h3 className="text-[2.2rem] font-black uppercase italic tracking-tighter leading-none">
-                  VALIDAR MEMBRO
+                  VALIDAR ACESSO
                 </h3>
               </div>
             </div>
@@ -169,24 +196,24 @@ const App: React.FC = () => {
               <form onSubmit={handleManualVerify} className="space-y-6">
                 <div>
                   <p className="text-[#8e99ab] text-[11px] font-black uppercase tracking-widest mb-4">
-                    INSIRE SEU E-MAIL DE COMPRA:
+                    E-MAIL UTILIZADO NA COMPRA:
                   </p>
                   <input 
-                    type="text" 
+                    type="email" 
                     required 
                     autoFocus 
                     value={emailToVerify} 
                     onChange={(e) => setEmailToVerify(e.target.value)} 
-                    placeholder="exemplo@gmail.com" 
-                    className={`w-full px-8 py-6 rounded-[1.5rem] border-2 outline-none transition-all text-2xl font-bold ${
+                    placeholder="seuemail@exemplo.com" 
+                    className={`w-full px-8 py-6 rounded-[1.5rem] border-2 outline-none transition-all text-xl font-bold ${
                       verificationError 
                         ? 'border-[#ef4444] bg-[#fef2f2] text-[#1e293b]' 
                         : 'border-[#e2e8f0] focus:border-[#2563eb] text-[#1e293b]'
                     }`}
                   />
                   {verificationError && (
-                    <div className="mt-4 text-[#dc2626] text-[13px] font-bold flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full border border-[#dc2626] flex items-center justify-center text-[10px] font-black">!</div>
+                    <div className="mt-4 text-[#dc2626] text-[12px] font-bold flex items-center gap-2">
+                      <AlertCircle size={14} />
                       {verificationError}
                     </div>
                   )}
@@ -194,9 +221,9 @@ const App: React.FC = () => {
 
                 <button 
                   disabled={verifying} 
-                  className="w-full py-7 bg-[#2563eb] text-white font-black rounded-[1.5rem] shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 text-2xl uppercase tracking-tighter italic"
+                  className="w-full py-7 bg-[#2563eb] text-white font-black rounded-[1.5rem] shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 text-xl uppercase tracking-tighter italic"
                 >
-                  {verifying ? <RefreshCw className="animate-spin" /> : "LIBERAR MEU ACESSO"}
+                  {verifying ? <RefreshCw className="animate-spin" /> : "LIBERAR MEU ACESSO AGORA"}
                 </button>
               </form>
             </div>
