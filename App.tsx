@@ -9,7 +9,7 @@ import { Portal } from './components/Portal';
 import { Lock, ArrowRight, ShieldCheck, CheckCircle, MessageCircle, RefreshCw, X, Shield, Cpu, Database, Globe, AlertCircle } from 'lucide-react';
 
 // CONFIGURAÇÕES GERAIS
-const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818";
+const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818?affiliate=mFL9XPbn";
 const AUTH_TOKEN = "sucesso_patriota_2026"; 
 const MASTER_EMAIL = "admin@patriota.com"; 
 

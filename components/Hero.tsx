@@ -2,7 +2,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
-const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818";
+const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818?affiliate=mFL9XPbn";
 
 export const Hero: React.FC = () => {
   const handleCheckout = () => {
