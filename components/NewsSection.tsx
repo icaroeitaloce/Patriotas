@@ -2,7 +2,9 @@
 import React from 'react';
 import { Calendar, ChevronRight } from 'lucide-react';
 
-const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818?affiliate=mFL9XPbn";
+interface NewsProps {
+  onNavigate: (tab: string) => void;
+}
 
 const NEWS_DATA = [
   {
@@ -31,11 +33,7 @@ const NEWS_DATA = [
   }
 ];
 
-export const NewsSection: React.FC = () => {
-  const handleReadMore = () => {
-    window.location.href = CHECKOUT_URL;
-  };
-
+export const NewsSection: React.FC<NewsProps> = ({ onNavigate }) => {
   return (
     <section id="news" className="bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -45,7 +43,7 @@ export const NewsSection: React.FC = () => {
             <h3 className="text-4xl font-extrabold text-blue-900">Últimas Atualizações</h3>
           </div>
           <button 
-            onClick={handleReadMore}
+            onClick={() => onNavigate('pricing')}
             className="text-blue-600 font-bold flex items-center gap-1 hover:underline"
           >
             Ver todas as notícias <ChevronRight size={20} />
@@ -72,7 +70,7 @@ export const NewsSection: React.FC = () => {
                   {news.excerpt}
                 </p>
                 <button 
-                  onClick={handleReadMore}
+                  onClick={() => onNavigate('pricing')}
                   className="w-full py-3 bg-gray-50 rounded-lg text-blue-600 font-bold hover:bg-blue-50 transition-colors"
                 >
                   Ler Reportagem Completa

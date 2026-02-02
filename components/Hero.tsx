@@ -2,13 +2,11 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
-const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818?affiliate=mFL9XPbn";
+interface HeroProps {
+  onNavigate: (tab: string) => void;
+}
 
-export const Hero: React.FC = () => {
-  const handleCheckout = () => {
-    window.location.href = CHECKOUT_URL;
-  };
-
+export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
   return (
     <section className="relative bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center pt-12 pb-20 px-4 sm:px-6 lg:px-8">
@@ -26,7 +24,7 @@ export const Hero: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <button 
-              onClick={handleCheckout}
+              onClick={() => onNavigate('pricing')}
               className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2 group"
             >
               QUERO PARTICIPAR <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -45,7 +43,6 @@ export const Hero: React.FC = () => {
           <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-green-200 rounded-full blur-3xl opacity-30"></div>
           
           <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
-            <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/40 via-transparent to-green-600/20 mix-blend-overlay z-10"></div>
             <img 
               src="https://i.ibb.co/rDvLFD5/A-caminhada-iniciada-pelo-deputado-federal-Nikolas-Ferreira-partindo-de-Minas-Gerais-em-dire-o.jpg" 
               alt="Caminhada Nikolas Ferreira 2026" 

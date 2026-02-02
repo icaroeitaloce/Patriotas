@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { Send, Mail, User, ShieldCheck } from 'lucide-react';
 
-const CHECKOUT_URL = "https://pay.cakto.com.br/n2itqkw_747818?affiliate=mFL9XPbn";
+interface NewsletterProps {
+  onNavigate: (tab: string) => void;
+}
 
-export const NewsletterForm: React.FC = () => {
+export const NewsletterForm: React.FC<NewsletterProps> = ({ onNavigate }) => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -13,9 +15,8 @@ export const NewsletterForm: React.FC = () => {
     e.preventDefault();
     if (email && name) {
       setSubmitted(true);
-      // Simulate API call and redirect
       setTimeout(() => {
-        window.location.href = CHECKOUT_URL;
+        onNavigate('pricing');
       }, 3000);
     }
   };
@@ -82,18 +83,12 @@ export const NewsletterForm: React.FC = () => {
             </div>
             <h2 className="text-3xl font-bold text-blue-900 mb-4">Inscrição Confirmada!</h2>
             <p className="text-gray-600 text-lg mb-8">
-              Obrigado {name.split(' ')[0]}! Estamos te redirecionando para o nosso <strong>Portal VIP</strong> exclusivo...
+              Obrigado {name.split(' ')[0]}! Estamos te redirecionando para a escolha do seu <strong>Plano VIP</strong>...
             </p>
             <div className="flex flex-col items-center gap-4">
               <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
                 <div className="bg-blue-600 h-full animate-[progress_3s_ease-in-out]" style={{width: '100%'}}></div>
               </div>
-              <button 
-                onClick={() => window.location.href = CHECKOUT_URL}
-                className="text-blue-600 font-bold hover:underline"
-              >
-                Clique aqui se não for redirecionado em 3 segundos.
-              </button>
             </div>
           </div>
         )}
