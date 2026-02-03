@@ -10,28 +10,32 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
   return (
     <section className="relative bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center pt-12 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="lg:w-1/2 text-center lg:text-left z-10">
+        <div className="lg:w-1/2 text-center lg:text-left z-10 lg:pr-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 text-green-700 font-bold text-sm mb-6 border border-green-200">
             <CheckCircle2 size={16} /> A CAMINHADA FOI UM SUCESSO
           </div>
+          
           <h1 className="text-5xl lg:text-7xl font-extrabold text-blue-900 leading-tight mb-6">
             O Futuro do Brasil <br />
             <span className="text-transparent bg-clip-text bg-patriotic-gradient">Começa Agora</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-10 max-w-2xl">
-            Graças a Deus a nossa caminhada ocorreu bem! Fique por dentro de tudo sobre as eleições 
-            e as novidades de 2026 em primeira mão. Se você é patriota de verdade, junte-se a nós.
+          
+          <p className="text-base md:text-lg text-slate-800 font-medium mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            Tenha acesso à nossa Central de Inteligência Patriota. No Painel VIP, notícias e bastidores são 
+            <span className="text-blue-600 font-bold"> atualizados semanalmente por nossa IA avançada</span>, 
+            garantindo que você receba a verdade sem filtros e em tempo real.
           </p>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <button 
               onClick={() => onNavigate('pricing')}
-              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2 group"
+              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2 group uppercase tracking-tight"
             >
-              QUERO PARTICIPAR <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              QUERO MEU ACESSO VIP <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
             <button 
               onClick={() => document.getElementById('news')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-8 py-4 border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-all"
+              className="px-8 py-4 border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-all uppercase text-sm tracking-wide"
             >
               VER ÚLTIMAS NOTÍCIAS
             </button>
@@ -50,7 +54,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
             />
             <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-blue-950/90 via-blue-900/60 to-transparent text-white z-20 text-center lg:text-left">
               <p className="text-sm font-bold text-green-400 uppercase tracking-[0.2em] mb-2">Novo Horizonte</p>
-              <h3 className="text-3xl font-black italic">A CAMINHADA PELA LIBERDADE</h3>
+              <h3 className="text-3xl font-black italic uppercase">A CAMINHADA PELA LIBERDADE</h3>
               <p className="text-blue-100 mt-2 opacity-90">Rumo a 2026 com fé e coragem.</p>
             </div>
           </div>
