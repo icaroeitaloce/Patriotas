@@ -9,27 +9,27 @@ interface NewsProps {
 const NEWS_DATA = [
   {
     id: 1,
-    title: "A Caminhada: Um marco para a mobilização de 2026",
-    excerpt: "Milhares de brasileiros se reuniram para mostrar a força da nossa união em Minas Gerais.",
-    date: "15 de Outubro, 2024",
-    category: "Caminhada",
-    image: "https://i.ibb.co/j9yMYGbS/A-caminhada-iniciada-pelo-deputado-federal-Nikolas-Ferreira-partindo-de-Minas-Gerais-em-dire-o-1.jpg"
+    title: "Balanço do Governo: O impacto das reformas na economia",
+    excerpt: "Dados recentes mostram o crescimento do PIB e a redução do desemprego através de políticas de liberdade econômica.",
+    date: "23 de Março, 2026",
+    category: "Economia",
+    image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=800"
   },
   {
     id: 2,
-    title: "Planejamento Estratégico: O que esperar das próximas eleições",
-    excerpt: "Analistas debatem o cenário político e as principais pautas que defenderemos nos próximos meses.",
-    date: "12 de Outubro, 2024",
-    category: "Eleições",
-    image: "https://i.ibb.co/rDvLFD5/A-caminhada-iniciada-pelo-deputado-federal-Nikolas-Ferreira-partindo-de-Minas-Gerais-em-dire-o.jpg"
+    title: "Liberdade de Expressão: A luta contra a censura em Brasília",
+    excerpt: "Parlamentares se mobilizam para garantir o direito à livre manifestação e o combate ao autoritarismo.",
+    date: "22 de Março, 2026",
+    category: "Política",
+    image: "https://images.unsplash.com/photo-1589262804704-c5aa9e6de891?auto=format&fit=crop&q=80&w=800"
   },
   {
     id: 3,
-    title: "Novos Comitês: Como se tornar um voluntário em sua cidade",
-    excerpt: "Estamos expandindo nossa rede de apoio por todo o Brasil. Saiba como organizar um núcleo local.",
-    date: "10 de Outubro, 2024",
-    category: "Organização",
-    image: "https://i.ibb.co/j9yMYGbS/A-caminhada-iniciada-pelo-deputado-federal-Nikolas-Ferreira-partindo-de-Minas-Gerais-em-dire-o-1.jpg"
+    title: "Infraestrutura: As grandes obras que transformam o país",
+    excerpt: "Novas ferrovias e rodovias estão integrando o Brasil e reduzindo custos logísticos para o agronegócio.",
+    date: "21 de Março, 2026",
+    category: "Infraestrutura",
+    image: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=800"
   }
 ];
 
@@ -39,8 +39,8 @@ export const NewsSection: React.FC<NewsProps> = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
           <div>
-            <h2 className="text-sm font-bold text-green-600 tracking-widest uppercase mb-2">Fique por dentro</h2>
-            <h3 className="text-4xl font-extrabold text-blue-900">Últimas Atualizações</h3>
+            <h2 className="text-sm font-bold text-green-600 tracking-widest uppercase mb-2">Jornalismo Independente</h2>
+            <h3 className="text-4xl font-extrabold text-blue-900">Notícias do Dia</h3>
           </div>
           <button 
             onClick={() => onNavigate('pricing')}

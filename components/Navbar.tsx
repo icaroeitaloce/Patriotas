@@ -23,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, activeTab }) => {
         <div className="flex justify-between h-20 items-center">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => onNavigate('home')}>
             <Flag className="text-green-600 w-8 h-8" />
-            <span className="text-2xl font-extrabold tracking-tight text-blue-900">DIREITA<span className="text-green-600">2026</span></span>
+            <span className="text-2xl font-extrabold tracking-tight text-blue-900 uppercase">Jornal<span className="text-green-600">Patriota</span></span>
           </div>
           
           <div className="hidden md:flex space-x-8">

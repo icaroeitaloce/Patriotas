@@ -14,7 +14,7 @@ export const Pricing: React.FC = () => {
           PLANOS DE <span className="text-transparent bg-clip-text bg-patriotic-gradient">INTELIGÊNCIA</span>
         </h1>
         <p className="mt-6 text-slate-500 font-medium text-lg max-w-2xl mx-auto">
-          Selecione abaixo o plano que melhor se adapta à sua jornada patriota. O acesso é liberado instantaneamente após a confirmação.
+          Selecione abaixo o plano que melhor se adapta à sua necessidade de informação. O acesso é liberado instantaneamente após a confirmação.
         </p>
       </div>
 
@@ -38,7 +38,7 @@ export const Pricing: React.FC = () => {
           </div>
 
           <ul className="space-y-4 mb-12 flex-grow">
-            {['Acesso total ao Portal VIP', 'Notícias em tempo real', 'Análises de IA Semanais', 'Suporte VIP via WhatsApp'].map((item, i) => (
+            {['Acesso total ao Jornal VIP', 'Notícias em tempo real', 'Análises de IA Semanais', 'Suporte VIP via WhatsApp'].map((item, i) => (
               <li key={i} className="flex items-center gap-3 text-slate-600 font-medium">
                 <Check size={18} className="text-green-500" /> {item}
               </li>

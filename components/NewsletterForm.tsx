@@ -33,7 +33,7 @@ export const NewsletterForm: React.FC<NewsletterProps> = ({ onNavigate }) => {
                 Receba Tudo em Primeira Mão
               </h2>
               <p className="text-gray-600 text-lg">
-                Junte-se aos milhares de patriotas que recebem informações exclusivas sobre 2026.
+                Junte-se aos milhares de patriotas que recebem notícias exclusivas do governo.
               </p>
             </div>
 

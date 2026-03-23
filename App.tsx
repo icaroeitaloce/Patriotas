@@ -25,7 +25,7 @@ const WHITELIST_EMAILS = [
   "contato@direitabrasil.com"
 ];
 
-const WHATSAPP_SUPPORT_URL = "https://wa.me/5542933006492?text=Olá,%20sou%20membro%20VIP%20do%20Portal%20Patriota%20e%20preciso%20de%20suporte.";
+const WHATSAPP_SUPPORT_URL = "https://wa.me/5542933006492?text=Olá,%20sou%20membro%20VIP%20do%20Jornal%20Patriota%20e%20preciso%20de%20suporte.";
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -39,10 +39,10 @@ const App: React.FC = () => {
   const [verificationError, setVerificationError] = useState('');
 
   const processingMessages = [
-    "Sincronizando com a plataforma de pagamento...",
-    "Validando e-mail na base de dados VIP...",
-    "Configurando criptografia de acesso vitalício...",
-    "Liberando Central de Inteligência Patriota..."
+    "Sincronizando com a base de dados do Jornal...",
+    "Validando credenciais de acesso VIP...",
+    "Configurando criptografia de segurança...",
+    "Acessando Central de Notícias Exclusivas..."
   ];
 
   useEffect(() => {

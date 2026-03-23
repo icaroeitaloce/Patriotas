@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 interface HeroProps {
   onNavigate: (tab: string) => void;
@@ -11,19 +11,19 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
     <section className="relative bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center pt-12 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="lg:w-1/2 text-center lg:text-left z-10 lg:pr-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 text-green-700 font-bold text-sm mb-6 border border-green-200">
-            <CheckCircle2 size={16} /> A CAMINHADA FOI UM SUCESSO
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 font-bold text-sm mb-6 border border-blue-200">
+            <ShieldCheck size={16} className="text-yellow-500" /> NOTÍCIAS DE BRASÍLIA EM TEMPO REAL
           </div>
           
           <h1 className="text-5xl lg:text-7xl font-extrabold text-blue-900 leading-tight mb-6">
-            O Futuro do Brasil <br />
-            <span className="text-transparent bg-clip-text bg-patriotic-gradient">Começa Agora</span>
+            A Verdade Sobre o <br />
+            <span className="text-transparent bg-clip-text bg-patriotic-gradient">Governo Bolsonaro</span>
           </h1>
           
           <p className="text-base md:text-lg text-slate-800 font-medium mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-            Tenha acesso à nossa Central de Inteligência Patriota. No Painel VIP, notícias e bastidores são 
-            <span className="text-blue-600 font-bold"> atualizados semanalmente por nossa IA avançada</span>, 
-            garantindo que você receba a verdade sem filtros e em tempo real.
+            O Jornal Patriota é a sua fonte definitiva de informações sobre os bastidores do governo e a luta pela liberdade no Brasil. 
+            <span className="text-blue-600 font-bold"> Notícias exclusivas e análises sem filtros</span>, 
+            direto da nossa Central de Inteligência para você.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -49,13 +49,13 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
           <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
             <img 
               src="https://i.ibb.co/rDvLFD5/A-caminhada-iniciada-pelo-deputado-federal-Nikolas-Ferreira-partindo-de-Minas-Gerais-em-dire-o.jpg" 
-              alt="Caminhada Nikolas Ferreira 2026" 
+              alt="Governo Bolsonaro Notícias" 
               className="w-full h-[550px] object-cover"
             />
             <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-blue-950/90 via-blue-900/60 to-transparent text-white z-20 text-center lg:text-left">
-              <p className="text-sm font-bold text-green-400 uppercase tracking-[0.2em] mb-2">Novo Horizonte</p>
-              <h3 className="text-3xl font-black italic uppercase">A CAMINHADA PELA LIBERDADE</h3>
-              <p className="text-blue-100 mt-2 opacity-90">Rumo a 2026 com fé e coragem.</p>
+              <p className="text-sm font-bold text-green-400 uppercase tracking-[0.2em] mb-2">Edição Especial</p>
+              <h3 className="text-3xl font-black italic uppercase">A VOZ DA VERDADE</h3>
+              <p className="text-blue-100 mt-2 opacity-90">Informação de qualidade para o povo brasileiro.</p>
             </div>
           </div>
         </div>

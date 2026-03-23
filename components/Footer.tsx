@@ -10,11 +10,11 @@ export const Footer: React.FC = () => {
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-6">
               <Flag className="text-green-500 w-8 h-8" />
-              <span className="text-2xl font-black italic tracking-tighter">DIREITA 2026</span>
+              <span className="text-2xl font-black italic tracking-tighter uppercase">Jornal Patriota</span>
             </div>
             <p className="text-blue-200 text-lg max-w-md leading-relaxed">
-              Pelo Brasil, pela família e pela nossa liberdade. 
-              Juntos somos imbatíveis na caminhada rumo ao progresso e à verdade.
+              A voz da direita brasileira. 
+              Compromisso com a verdade, a família e a liberdade.
             </p>
           </div>
 
@@ -40,7 +40,7 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="pt-8 border-t border-blue-900 flex flex-col md:row justify-between items-center gap-4 text-sm text-blue-300">
-          <p>© 2024 Portal Direita 2026. Todos os direitos reservados.</p>
+          <p>© 2026 Jornal Patriota. Todos os direitos reservados.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-white">Política de Privacidade</a>
             <a href="#" className="hover:text-white">Termos de Uso</a>
