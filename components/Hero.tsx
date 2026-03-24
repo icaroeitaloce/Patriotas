@@ -48,7 +48,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
           
           <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
             <img 
-              src="https://i.ibb.co/rDvLFD5/A-caminhada-iniciada-pelo-deputado-federal-Nikolas-Ferreira-partindo-de-Minas-Gerais-em-dire-o.jpg" 
+              src="https://i.ibb.co/8LjDx9n6/imagem-2026-03-23-205304278.png" 
               alt="Governo Bolsonaro Notícias" 
               className="w-full h-[550px] object-cover"
             />

@@ -13,7 +13,7 @@ const NEWS_DATA = [
     excerpt: "Dados recentes mostram o crescimento do PIB e a redução do desemprego através de políticas de liberdade econômica.",
     date: "23 de Março, 2026",
     category: "Economia",
-    image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=800"
+    image: "https://i.ibb.co/8LjDx9n6/imagem-2026-03-23-205304278.png"
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const NEWS_DATA = [
     excerpt: "Parlamentares se mobilizam para garantir o direito à livre manifestação e o combate ao autoritarismo.",
     date: "22 de Março, 2026",
     category: "Política",
-    image: "https://images.unsplash.com/photo-1589262804704-c5aa9e6de891?auto=format&fit=crop&q=80&w=800"
+    image: "https://i.ibb.co/6cGY0yDz/imagem-2026-03-23-205350616.png"
   },
   {
     id: 3,
@@ -29,7 +29,7 @@ const NEWS_DATA = [
     excerpt: "Novas ferrovias e rodovias estão integrando o Brasil e reduzindo custos logísticos para o agronegócio.",
     date: "21 de Março, 2026",
     category: "Infraestrutura",
-    image: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=800"
+    image: "https://i.ibb.co/fV2QHd5n/image.png"
   }
 ];
 

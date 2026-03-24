@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { 
   TrendingUp, User, ShieldAlert, LogOut, 
   ExternalLink, RefreshCw, Cpu, ChevronRight, X, 
@@ -25,9 +25,9 @@ interface IntelligenceData {
 }
 
 const NEW_IMAGES = [
-  "https://i.ibb.co/j9yMYGbS/A-caminhada-iniciada-pelo-deputado-federal-Nikolas-Ferreira-partindo-de-Minas-Gerais-em-dire-o-1.jpg",
-  "https://i.ibb.co/rDvLFD5/A-caminhada-iniciada-pelo-deputado-federal-Nikolas-Ferreira-partindo-de-Minas-Gerais-em-dire-o.jpg",
-  "https://i.ibb.co/j9yMYGbS/A-caminhada-iniciada-pelo-deputado-federal-Nikolas-Ferreira-partindo-de-Minas-Gerais-em-dire-o-1.jpg"
+  "https://i.ibb.co/8LjDx9n6/imagem-2026-03-23-205304278.png",
+  "https://i.ibb.co/6cGY0yDz/imagem-2026-03-23-205350616.png",
+  "https://i.ibb.co/fV2QHd5n/image.png"
 ];
 
 // Removendo a primeira declaração duplicada do Flag
@@ -37,13 +37,22 @@ interface PortalProps {
   onLogout: () => void;
 }
 
+function Flag({ size = 24, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+      <line x1="4" y1="22" x2="4" y2="15" />
+    </svg>
+  );
+}
+
 export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [briefing, setBriefing] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  
   const fetchWeeklyIntelligence = async () => {
     setLoading(true);
     setError(null);
@@ -89,30 +98,59 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
         }`,
         config: {
           tools: [{ googleSearch: {} }],
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              weekly_briefing: { type: Type.STRING },
+              articles: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    title: { type: Type.STRING },
+                    excerpt: { type: Type.STRING },
+                    full_content: { type: Type.STRING },
+                    category: { type: Type.STRING },
+                    date: { type: Type.STRING },
+                    author: { type: Type.STRING },
+                    sourceUrl: { type: Type.STRING }
+                  },
+                  required: ["title", "excerpt", "full_content", "category", "date", "author", "sourceUrl"]
+                }
+              }
+            },
+            required: ["weekly_briefing", "articles"]
+          }
         }
       });
 
       const rawText = response.text || "";
       console.log("Portal VIP: Resposta recebida, validando dados...");
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       
-      if (jsonMatch) {
-        const data: IntelligenceData = JSON.parse(jsonMatch[0]);
-        
-        if (data.articles && data.articles.length > 0) {
-          console.log(`Portal VIP: ${data.articles.length} notícias reais processadas com sucesso.`);
-          const processedNews = data.articles.map((item, idx) => ({
-            ...item,
-            imageUrl: NEW_IMAGES[idx % 3],
-          }));
-          
-          setNews(processedNews);
-          setBriefing(data.weekly_briefing);
+      let data: IntelligenceData;
+      try {
+        data = JSON.parse(rawText);
+      } catch (e) {
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          data = JSON.parse(jsonMatch[0]);
         } else {
-          throw new Error("Dados de notícias vazios na resposta da IA");
+          throw new Error("Falha ao processar JSON da IA");
         }
+      }
+      
+      if (data.articles && data.articles.length > 0) {
+        console.log(`Portal VIP: ${data.articles.length} notícias reais processadas com sucesso.`);
+        const processedNews = data.articles.map((item, idx) => ({
+          ...item,
+          imageUrl: NEW_IMAGES[idx % NEW_IMAGES.length],
+        }));
+        
+        setNews(processedNews);
+        setBriefing(data.weekly_briefing);
       } else {
-        throw new Error("Formato de resposta da IA inválido");
+        throw new Error("Dados de notícias vazios na resposta da IA");
       }
     } catch (err) {
       console.error("Portal VIP: Falha na sincronização em tempo real. Ativando backup local.", err);
@@ -427,9 +465,3 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
   );
 };
 
-const Flag = ({ size = 24, className = "" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-    <line x1="4" y1="22" x2="4" y2="15" />
-  </svg>
-);
