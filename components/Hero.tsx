@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldAlert, EyeOff, Lock, AlertTriangle } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface HeroProps {
   onNavigate: (tab: string) => void;
@@ -8,58 +9,87 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
   return (
-    <section className="relative bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center pt-12 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="lg:w-1/2 text-center lg:text-left z-10 lg:pr-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 font-bold text-sm mb-6 border border-blue-200">
-            <ShieldCheck size={16} className="text-yellow-500" /> NOTÍCIAS DE BRASÍLIA EM TEMPO REAL
-          </div>
-          
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-blue-900 leading-tight mb-6">
-            A Verdade Sobre o <br />
-            <span className="text-transparent bg-clip-text bg-patriotic-gradient">Governo Bolsonaro</span>
-          </h1>
-          
-          <p className="text-base md:text-lg text-slate-800 font-medium mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-            O Jornal Patriota é a sua fonte definitiva de informações sobre os bastidores do governo e a luta pela liberdade no Brasil. 
-            <span className="text-blue-600 font-bold"> Notícias exclusivas e análises sem filtros</span>, 
-            direto da nossa Central de Inteligência para você.
-          </p>
+    <section className="relative bg-black overflow-hidden py-24 lg:py-32">
+      {/* Background elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-patriotic-green/10 rounded-full blur-[120px]"></div>
+        <div className="absolute top-1/2 -right-24 w-96 h-96 bg-patriotic-blue/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-0 left-1/4 w-full h-px bg-gradient-to-r from-transparent via-patriotic-yellow/20 to-transparent"></div>
+      </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col items-center text-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/30 text-red-500 border border-red-900/50 text-xs font-black tracking-widest uppercase mb-8 animate-pulse"
+          >
+            <AlertTriangle size={14} /> CONTEÚDO SOB RISCO DE CENSURA
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] mb-8 tracking-tighter uppercase italic"
+          >
+            O MATERIAL QUE ESTÃO <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-patriotic-yellow via-white to-patriotic-green">TENTANDO REMOVER</span> <br />
+            DA INTERNET
+          </motion.h1>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="text-lg md:text-xl text-zinc-400 font-medium mb-12 max-w-2xl mx-auto leading-relaxed"
+          >
+            Acesse agora a Central de Inteligência do <span className="text-white font-bold">Jornal Patriota</span>. 
+            Documentos, vídeos e fatos que a grande mídia se recusa a mostrar. 
+            <span className="block mt-2 text-patriotic-yellow font-bold uppercase tracking-widest text-sm">Exclusividade absoluta. Segredo de estado.</span>
+          </motion.p>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex flex-col sm:flex-row gap-6 w-full max-w-md"
+          >
             <button 
               onClick={() => onNavigate('pricing')}
-              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2 group uppercase tracking-tight"
+              className="group relative flex-1 px-8 py-6 bg-patriotic-yellow text-black font-black rounded-sm shadow-[0_0_30px_rgba(254,221,0,0.3)] hover:shadow-[0_0_50px_rgba(254,221,0,0.5)] transition-all duration-300 uppercase tracking-tighter italic text-xl flex items-center justify-center gap-3 overflow-hidden"
             >
-              QUERO MEU ACESSO VIP <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+              ACESSAR AGORA <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
             </button>
-            <button 
-              onClick={() => document.getElementById('news')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-8 py-4 border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-all uppercase text-sm tracking-wide"
-            >
-              VER ÚLTIMAS NOTÍCIAS
-            </button>
-          </div>
-        </div>
-        
-        <div className="lg:w-1/2 mt-12 lg:mt-0 relative">
-          <div className="absolute -top-10 -right-10 w-64 h-64 bg-yellow-200 rounded-full blur-3xl opacity-30"></div>
-          <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-green-200 rounded-full blur-3xl opacity-30"></div>
-          
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
-            <img 
-              src="https://i.ibb.co/8LjDx9n6/imagem-2026-03-23-205304278.png" 
-              alt="Governo Bolsonaro Notícias" 
-              className="w-full h-[550px] object-cover"
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-blue-950/90 via-blue-900/60 to-transparent text-white z-20 text-center lg:text-left">
-              <p className="text-sm font-bold text-green-400 uppercase tracking-[0.2em] mb-2">Edição Especial</p>
-              <h3 className="text-3xl font-black italic uppercase">A VOZ DA VERDADE</h3>
-              <p className="text-blue-100 mt-2 opacity-90">Informação de qualidade para o povo brasileiro.</p>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1 }}
+            className="mt-16 flex flex-wrap justify-center gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-500"
+          >
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+              <Lock size={14} /> Criptografia 256-bit
             </div>
-          </div>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+              <EyeOff size={14} /> Navegação Anônima
+            </div>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+              <ShieldAlert size={14} /> Servidores Blindados
+            </div>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-patriotic-yellow animate-pulse">
+              <div className="w-2 h-2 bg-patriotic-yellow rounded-full"></div>
+              1.247 PATRIOTAS CONECTADOS AGORA
+            </div>
+          </motion.div>
         </div>
       </div>
+
+      {/* Decorative scanline effect */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>
     </section>
   );
 };

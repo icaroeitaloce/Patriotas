@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --color-patriotic-green: #009b3a;
+  --color-patriotic-yellow: #fedd00;
+  --color-patriotic-blue: #002776;
+  --color-patriotic-dark: #0a0a0a;
+}
+
+@layer base {
+  body {
+    @apply bg-black text-white selection:bg-patriotic-yellow selection:text-black;
+  }
+}
+
+.bg-patriotic-gradient {
+  background: linear-gradient(135deg, #002776 0%, #009b3a 100%);
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(254, 221, 0, 0.5);
+}
+
+.censored-text {
+  background-color: #000;
+  color: transparent;
+  transition: color 0.3s ease;
+}
+
+.censored-text:hover {
+  color: #fff;
+  background-color: transparent;
+}
+
+.aggressive-border {
+  border: 1px solid rgba(254, 221, 0, 0.2);
+}
+
+.aggressive-border:hover {
+  border-color: #fedd00;
+}

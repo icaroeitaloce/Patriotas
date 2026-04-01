@@ -35,45 +35,46 @@ const NEWS_DATA = [
 
 export const NewsSection: React.FC<NewsProps> = ({ onNavigate }) => {
   return (
-    <section id="news" className="bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
+    <section id="news" className="bg-black py-24 px-4 sm:px-6 lg:px-8 border-t border-white/5">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div>
-            <h2 className="text-sm font-bold text-green-600 tracking-widest uppercase mb-2">Jornalismo Independente</h2>
-            <h3 className="text-4xl font-extrabold text-blue-900">Notícias do Dia</h3>
+            <h2 className="text-xs font-black text-patriotic-green tracking-[0.4em] uppercase mb-4">INTELIGÊNCIA DE CAMPO</h2>
+            <h3 className="text-5xl font-black text-white uppercase italic tracking-tighter">ARQUIVOS <span className="text-patriotic-yellow">DESCLASSIFICADOS</span></h3>
           </div>
           <button 
             onClick={() => onNavigate('pricing')}
-            className="text-blue-600 font-bold flex items-center gap-1 hover:underline"
+            className="text-patriotic-yellow font-black uppercase tracking-widest text-xs flex items-center gap-2 hover:text-white transition-colors group"
           >
-            Ver todas as notícias <ChevronRight size={20} />
+            VER TODOS OS ARQUIVOS <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
           {NEWS_DATA.map((news) => (
-            <article key={news.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow border border-gray-100 group">
-              <div className="h-56 overflow-hidden relative">
-                <img src={news.image} alt={news.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute top-4 left-4 bg-patriotic-gradient text-white px-3 py-1 rounded-full text-xs font-bold uppercase">
+            <article key={news.id} className="bg-zinc-900/50 rounded-sm overflow-hidden border border-white/5 hover:border-patriotic-yellow/30 transition-all duration-500 group relative">
+              <div className="h-64 overflow-hidden relative">
+                <img src={news.image} alt={news.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                <div className="absolute top-6 left-6 bg-black/80 backdrop-blur-md text-white px-4 py-1.5 rounded-sm text-[10px] font-black uppercase tracking-widest border border-white/10">
                   {news.category}
                 </div>
               </div>
-              <div className="p-6">
-                <div className="flex items-center gap-4 text-xs text-gray-400 mb-4">
-                  <span className="flex items-center gap-1"><Calendar size={14} /> {news.date}</span>
+              <div className="p-8">
+                <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-6">
+                  <span className="flex items-center gap-1.5"><Calendar size={14} className="text-patriotic-green" /> {news.date}</span>
                 </div>
-                <h4 className="text-xl font-bold text-blue-900 mb-3 group-hover:text-blue-600 transition-colors">
+                <h4 className="text-2xl font-black text-white mb-4 group-hover:text-patriotic-yellow transition-colors leading-tight uppercase italic tracking-tighter">
                   {news.title}
                 </h4>
-                <p className="text-gray-600 mb-6 line-clamp-2">
+                <p className="text-zinc-400 mb-8 line-clamp-2 text-sm leading-relaxed">
                   {news.excerpt}
                 </p>
                 <button 
                   onClick={() => onNavigate('pricing')}
-                  className="w-full py-3 bg-gray-50 rounded-lg text-blue-600 font-bold hover:bg-blue-50 transition-colors"
+                  className="w-full py-4 bg-white/5 border border-white/10 rounded-sm text-white font-black uppercase tracking-widest text-xs hover:bg-patriotic-yellow hover:text-black transition-all duration-300 italic"
                 >
-                  Ler Reportagem Completa
+                  DESBLOQUEAR CONTEÚDO
                 </button>
               </div>
             </article>

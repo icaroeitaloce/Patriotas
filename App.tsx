@@ -7,6 +7,7 @@ import { NewsletterForm } from './components/NewsletterForm';
 import { Footer } from './components/Footer';
 import { Portal } from './components/Portal';
 import { Pricing } from './components/Pricing';
+import { Testimonials } from './components/Testimonials';
 import { Lock, ArrowRight, ShieldCheck, CheckCircle, MessageCircle, RefreshCw, X, Shield, Cpu, Database, Globe, AlertCircle, Clock } from 'lucide-react';
 
 // CONFIGURAÇÕES GERAIS
@@ -37,6 +38,7 @@ const App: React.FC = () => {
   const [verifying, setVerifying] = useState(false);
   const [emailToVerify, setEmailToVerify] = useState('');
   const [verificationError, setVerificationError] = useState('');
+  const [timeLeft, setTimeLeft] = useState(900); // 15 minutos para a home também
 
   const processingMessages = [
     "Sincronizando com a base de dados do Jornal...",
@@ -44,6 +46,19 @@ const App: React.FC = () => {
     "Configurando criptografia de segurança...",
     "Acessando Central de Notícias Exclusivas..."
   ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     // 1. Verifica sessão e validade temporal
@@ -201,13 +216,28 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative bg-gray-50">
+    <div className="min-h-screen flex flex-col relative bg-black text-white selection:bg-patriotic-yellow selection:text-black">
+      {activeTab === 'home' && (
+        <div className="bg-patriotic-yellow text-black py-2 px-4 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12 z-50 relative overflow-hidden">
+          <div className="flex items-center gap-2 font-black text-[10px] uppercase tracking-widest animate-pulse">
+            <AlertCircle size={14} /> AVISO: ESTE CONTEÚDO PODE SER REMOVIDO A QUALQUER MOMENTO POR ORDEM JUDICIAL
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 text-xs font-black italic">
+              <Clock size={16} /> TEMPO RESTANTE PARA ACESSO: <span className="bg-black text-patriotic-yellow px-2 py-0.5 rounded-sm tabular-nums">{formatTime(timeLeft)}</span>
+            </div>
+            <div className="hidden md:flex items-center gap-2 text-xs font-black">
+              <Shield size={16} /> <span className="text-black/70">CONEXÃO SEGURA E CRIPTOGRAFADA</span>
+            </div>
+          </div>
+        </div>
+      )}
       <Navbar onNavigate={setActiveTab} activeTab={activeTab} />
       
       {showSuccessToast && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] animate-in slide-in-from-top duration-700">
-          <div className="bg-green-600 text-white px-8 py-5 rounded-3xl shadow-2xl flex items-center gap-4 border-2 border-green-400/50 backdrop-blur-md">
-            <div className="bg-white p-2 rounded-full text-green-600 shadow-inner"><ShieldCheck size={28} /></div>
+          <div className="bg-patriotic-green text-white px-8 py-5 rounded-sm shadow-[0_0_50px_rgba(0,155,58,0.4)] flex items-center gap-4 border border-patriotic-green/50 backdrop-blur-md">
+            <div className="bg-white p-2 rounded-full text-patriotic-green shadow-inner"><ShieldCheck size={28} /></div>
             <div>
               <p className="font-black uppercase text-lg tracking-tighter italic">ACESSO VIP LIBERADO!</p>
               <p className="text-[10px] text-green-100 font-bold opacity-90 uppercase tracking-[0.2em] text-glow">Bem-vindo à Central de Inteligência.</p>
@@ -217,36 +247,36 @@ const App: React.FC = () => {
       )}
 
       {showValidationModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all">
-          <div className="bg-white rounded-[4rem] shadow-[0_40px_100px_rgba(0,0,0,0.3)] w-full max-w-md overflow-hidden relative animate-in zoom-in duration-300 border-4 border-white">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl transition-all">
+          <div className="bg-zinc-900 rounded-sm shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-md overflow-hidden relative animate-in zoom-in duration-300 border border-white/10">
             <div className="bg-patriotic-gradient pt-16 pb-12 px-12 text-white relative">
-              <button onClick={() => setShowValidationModal(false)} className="absolute top-8 right-8 w-12 h-12 bg-white/10 flex items-center justify-center rounded-full text-white hover:bg-white/20 transition-all shadow-lg backdrop-blur-md">
+              <button onClick={() => setShowValidationModal(false)} className="absolute top-8 right-8 w-12 h-12 bg-black/20 flex items-center justify-center rounded-full text-white hover:bg-black/40 transition-all shadow-lg backdrop-blur-md">
                 <X size={24} strokeWidth={3} />
               </button>
               <div className="flex flex-col items-center text-center gap-4">
-                <div className="p-4 bg-white/10 rounded-3xl backdrop-blur-xl border border-white/20">
-                  <ShieldCheck size={48} className="text-yellow-400" strokeWidth={2.5} />
+                <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-xl border border-white/20">
+                  <ShieldCheck size={48} className="text-patriotic-yellow" strokeWidth={2.5} />
                 </div>
                 <h3 className="text-3xl font-black uppercase italic tracking-tighter leading-none mt-2">
-                  VALIDAR MEU<br/><span className="text-yellow-400">ACESSO VIP</span>
+                  VALIDAR MEU<br/><span className="text-patriotic-yellow">ACESSO VIP</span>
                 </h3>
               </div>
             </div>
             <div className="p-12">
               <form onSubmit={handleManualVerify} className="space-y-8">
                 <div className="relative">
-                  <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4 ml-2">E-MAIL DA COMPRA:</p>
-                  <input type="email" required autoFocus value={emailToVerify} onChange={(e) => setEmailToVerify(e.target.value)} placeholder="exemplo@gmail.com" className={`w-full px-8 py-7 rounded-[2rem] border-4 outline-none transition-all text-xl font-bold placeholder:text-slate-300 ${verificationError ? 'border-red-100 bg-red-50 text-red-900' : 'border-slate-50 bg-slate-50 focus:border-blue-500 focus:bg-white text-slate-900 shadow-inner'}`} />
+                  <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 ml-2">E-MAIL DA COMPRA:</p>
+                  <input type="email" required autoFocus value={emailToVerify} onChange={(e) => setEmailToVerify(e.target.value)} placeholder="exemplo@gmail.com" className={`w-full px-8 py-7 rounded-sm border-2 outline-none transition-all text-xl font-bold placeholder:text-zinc-700 ${verificationError ? 'border-red-900 bg-red-950/20 text-red-500' : 'border-white/5 bg-black focus:border-patriotic-yellow text-white shadow-inner'}`} />
                   {verificationError && (
-                    <div className="mt-4 text-red-600 text-[11px] font-bold flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
+                    <div className="mt-4 text-red-500 text-[11px] font-bold flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
                       <AlertCircle size={16} /> {verificationError}
                     </div>
                   )}
                 </div>
-                <button disabled={verifying} className="w-full py-8 bg-blue-600 text-white font-black rounded-[2rem] shadow-[0_20px_40px_rgba(37,99,235,0.25)] hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-4 disabled:opacity-80 text-xl uppercase tracking-tighter italic">
+                <button disabled={verifying} className="w-full py-8 bg-patriotic-yellow text-black font-black rounded-sm shadow-[0_10px_30px_rgba(254,221,0,0.2)] hover:bg-white active:scale-95 transition-all flex items-center justify-center gap-4 disabled:opacity-80 text-xl uppercase tracking-tighter italic">
                   {verifying ? <><RefreshCw className="animate-spin" size={24} /> <span>SINCRONIZANDO...</span></> : <><ArrowRight size={24} /> <span>ENTRAR NO PORTAL</span></>}
                 </button>
-                <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">Proteção de dados 256-bit ativa</p>
+                <p className="text-center text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Proteção de dados 256-bit ativa</p>
               </form>
             </div>
           </div>
@@ -254,29 +284,29 @@ const App: React.FC = () => {
       )}
 
       <main className="flex-grow">
-        {activeTab === 'home' && <><Hero onNavigate={setActiveTab} /><NewsSection onNavigate={setActiveTab} /><NewsletterForm onNavigate={setActiveTab} /></>}
+        {activeTab === 'home' && <><Hero onNavigate={setActiveTab} /><Testimonials /><NewsSection onNavigate={setActiveTab} /><NewsletterForm onNavigate={setActiveTab} /></>}
         {activeTab === 'pricing' && <Pricing />}
-        {activeTab === 'noticias' && <div className="py-24 px-4 max-w-7xl mx-auto"><h1 className="text-5xl font-black mb-12 text-blue-900 uppercase italic tracking-tighter">A <span className="text-green-600 underline">VERDADE</span> DOS FATOS</h1><NewsSection onNavigate={setActiveTab} /></div>}
+        {activeTab === 'noticias' && <div className="py-24 px-4 max-w-7xl mx-auto"><h1 className="text-5xl font-black mb-12 text-white uppercase italic tracking-tighter">A <span className="text-patriotic-green underline">VERDADE</span> DOS FATOS</h1><NewsSection onNavigate={setActiveTab} /></div>}
         
         {activeTab === 'portal' && (
           isAuthorized ? <Portal onLogout={handleLogout} /> : (
-            <div className="min-h-[80vh] flex items-center justify-center px-4 py-16 bg-slate-50/50">
-              <div className="max-w-[360px] w-full bg-white rounded-[3rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.12)] overflow-hidden border border-white">
+            <div className="min-h-[80vh] flex items-center justify-center px-4 py-16 bg-black">
+              <div className="max-w-[360px] w-full bg-zinc-900 rounded-sm shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden border border-white/5">
                 <div className="bg-patriotic-gradient pt-14 pb-10 text-center text-white relative flex flex-col items-center">
-                  <div className="mb-6 bg-white/10 p-5 rounded-3xl backdrop-blur-xl border border-white/20">
+                  <div className="mb-6 bg-white/10 p-5 rounded-2xl backdrop-blur-xl border border-white/20">
                     <Lock size={44} strokeWidth={1.5} className="text-white" />
                   </div>
-                  <h2 className="text-[2rem] font-black uppercase tracking-tighter italic leading-none relative z-10">ÁREA <span className="text-yellow-400">RESTRITA</span></h2>
+                  <h2 className="text-[2rem] font-black uppercase tracking-tighter italic leading-none relative z-10">ÁREA <span className="text-patriotic-yellow">RESTRITA</span></h2>
                 </div>
                 <div className="pt-14 pb-12 px-10 text-center flex flex-col items-center">
-                  <button onClick={() => setActiveTab('pricing')} className="w-full py-6 bg-[#10a54a] text-white font-black rounded-2xl shadow-[0_15px_30px_rgba(16,165,74,0.2)] hover:bg-green-600 hover:-translate-y-1 active:scale-95 transition-all text-lg uppercase italic tracking-tighter border-b-4 border-green-800">
+                  <button onClick={() => setActiveTab('pricing')} className="w-full py-6 bg-patriotic-green text-white font-black rounded-sm shadow-[0_10px_30px_rgba(0,155,58,0.2)] hover:bg-green-500 hover:-translate-y-1 active:scale-95 transition-all text-lg uppercase italic tracking-tighter border-b-4 border-green-900">
                     OBTER MEU ACESSO VIP
                   </button>
-                  <button onClick={() => { setVerificationError(''); setShowValidationModal(true); }} className="mt-8 text-slate-400 font-black uppercase text-[11px] tracking-[0.2em] hover:text-blue-600 transition-colors flex items-center gap-2 group">
+                  <button onClick={() => { setVerificationError(''); setShowValidationModal(true); }} className="mt-8 text-zinc-500 font-black uppercase text-[11px] tracking-[0.2em] hover:text-white transition-colors flex items-center gap-2 group">
                     <ShieldCheck size={14} className="group-hover:scale-110 transition-transform" /> JÁ SOU MEMBRO? VALIDAR
                   </button>
-                  <div className="mt-12 pt-8 border-t border-slate-100 w-full flex justify-center">
-                    <a href={WHATSAPP_SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-50 text-slate-500 hover:bg-green-50 hover:text-green-600 rounded-full font-black text-[10px] uppercase tracking-widest transition-all">
+                  <div className="mt-12 pt-8 border-t border-white/5 w-full flex justify-center">
+                    <a href={WHATSAPP_SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white rounded-full font-black text-[10px] uppercase tracking-widest transition-all">
                       <MessageCircle size={14} /> SUPORTE TÉCNICO
                     </a>
                   </div>
@@ -285,7 +315,7 @@ const App: React.FC = () => {
             </div>
           )
         )}
-        {activeTab === 'sobre' && <div className="py-24 px-4 max-w-5xl mx-auto text-center"><h1 className="text-6xl font-black mb-6 text-blue-950 uppercase italic tracking-tighter">Nossa Bandeira</h1></div>}
+        {activeTab === 'sobre' && <div className="py-24 px-4 max-w-5xl mx-auto text-center"><h1 className="text-6xl font-black mb-6 text-white uppercase italic tracking-tighter">Nossa Bandeira</h1></div>}
       </main>
       <Footer />
     </div>

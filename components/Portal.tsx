@@ -45,42 +45,51 @@ function Flag({ size = 24, className = "" }: { size?: number; className?: string
     </svg>
   );
 }
-
 export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [briefing, setBriefing] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [timeLeft, setTimeLeft] = useState(900); // 15 minutos
+  const [onlineUsers, setOnlineUsers] = useState(1247);
+
+  // Contador Regressivo
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Simulador de usuários online
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setOnlineUsers(prev => prev + Math.floor(Math.random() * 5) - 2);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
   
   const fetchWeeklyIntelligence = async () => {
     setLoading(true);
     setError(null);
-    console.log("Portal VIP: Iniciando busca de inteligência semanal...");
-    
     try {
       const apiKey = process.env.GEMINI_API_KEY;
-      
-      if (!apiKey || apiKey === "undefined") {
-        console.warn("Portal VIP: GEMINI_API_KEY não detectada ou inválida. Carregando modo de segurança.");
-        throw new Error("Configuração de API ausente");
-      }
+      if (!apiKey || apiKey === "undefined") throw new Error("Configuração de API ausente");
 
       const ai = new GoogleGenAI({ apiKey });
       const today = new Date().toLocaleDateString('pt-BR');
       
-      console.log("Portal VIP: Conectando ao cérebro de IA...");
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `Hoje é ${today}. Você é um analista sênior de inteligência política do Jornal Patriota. 
         PESQUISE usando Google Search e retorne obrigatoriamente as 3 NOTÍCIAS REAIS MAIS RECENTES (desta semana) sobre o Governo Bolsonaro, articulações da oposição em Brasília, e movimentos da Direita para 2026.
-        
-        REGRAS CRÍTICAS:
-        1. Localize URLs REAIS de grandes portais (Pleno News, Gazeta do Povo, G1, R7, CNN Brasil, Jovem Pan).
-        2. Para cada notícia, escreva um texto detalhado e analítico (mínimo de 5 parágrafos).
-        3. O campo 'sourceUrl' deve conter o link real encontrado na busca.
-        4. O tom deve ser informativo e focado nos bastidores do poder.
-        
         RETORNE APENAS JSON NO FORMATO:
         {
           "weekly_briefing": "Resumo analítico da semana em 3 parágrafos",
@@ -126,44 +135,33 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
       });
 
       const rawText = response.text || "";
-      console.log("Portal VIP: Resposta recebida, validando dados...");
-      
       let data: IntelligenceData;
       try {
         data = JSON.parse(rawText);
       } catch (e) {
         const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          data = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error("Falha ao processar JSON da IA");
-        }
+        if (jsonMatch) data = JSON.parse(jsonMatch[0]);
+        else throw new Error("Falha ao processar JSON da IA");
       }
       
       if (data.articles && data.articles.length > 0) {
-        console.log(`Portal VIP: ${data.articles.length} notícias reais processadas com sucesso.`);
         const processedNews = data.articles.map((item, idx) => ({
           ...item,
           imageUrl: NEW_IMAGES[idx % NEW_IMAGES.length],
         }));
-        
         setNews(processedNews);
         setBriefing(data.weekly_briefing);
       } else {
-        throw new Error("Dados de notícias vazios na resposta da IA");
+        throw new Error("IA retornou dados vazios");
       }
     } catch (err) {
-      console.error("Portal VIP: Falha na sincronização em tempo real. Ativando backup local.", err);
       setError(err instanceof Error ? err.message : "Erro desconhecido");
-      
-      // FALLBACK SEGURO: Sempre garante que o usuário veja conteúdo de qualidade
-      setBriefing("O monitoramento do Jornal Patriota detectou movimentações intensas em Brasília nesta semana. As articulações para 2026 entraram em uma fase decisiva, com foco na unificação da base conservadora e na fiscalização rigorosa das políticas atuais. A resistência parlamentar tem sido fundamental para manter o equilíbrio dos poderes.");
-      
+      setBriefing("O monitoramento do Jornal Patriota detectou movimentações intensas em Brasília nesta semana. As articulações para 2026 entraram em uma fase decisiva, com foco na unificação da base conservadora e na fiscalização rigorosa das políticas atuais.");
       setNews([
         {
           title: "Balanço Estratégico: O Legado Econômico e os Novos Rumos para 2026",
           excerpt: "Análise profunda sobre como as políticas de liberdade econômica do governo Bolsonaro continuam influenciando o debate nacional.",
-          full_content: "O cenário político brasileiro em Março de 2026 mostra que o legado econômico do governo Bolsonaro permanece como o principal ponto de referência para a oposição. Dados recentes indicam que as reformas estruturais realizadas entre 2019 e 2022 criaram uma resiliência no mercado que ainda sustenta setores vitais, como o agronegócio e a infraestrutura.\n\nEspecialistas em Brasília apontam que a articulação da direita para as próximas eleições presidenciais está sendo construída sobre esses pilares. O foco não é apenas a crítica ao governo atual, mas a apresentação de um projeto sólido de continuidade das políticas de desburocratização e redução da máquina pública.\n\nA Central de Inteligência do Jornal Patriota apurou que reuniões de alto nível ocorreram nos últimos dias para definir os nomes que liderarão as frentes parlamentares. A união entre os diferentes espectros da direita é vista como essencial para garantir uma vitória expressiva no legislativo, permitindo a governabilidade necessária para as reformas que o país ainda precisa.\n\nA militância digital, agora mais organizada e profissional, tem desempenhado um papel crucial na disseminação de dados reais que a mídia tradicional muitas vezes omite. Este Portal VIP serve como o centro nervoso dessa comunicação, garantindo que o patriota tenha acesso a informações sem filtros e com profundidade analítica.\n\nNo campo da segurança pública, o modelo de tolerância zero continua sendo a maior demanda da base. O sucesso de políticas anteriores de combate ao crime organizado serve de base para as novas propostas que visam devolver a paz às famílias brasileiras. A defesa da liberdade individual e do direito à legítima defesa permanecem inegociáveis.\n\nInternacionalmente, o Brasil busca retomar seu protagonismo sem submissão ideológica. As parcerias estratégicas com nações que compartilham valores de liberdade e mercado são a prioridade. O objetivo é transformar o Brasil em um hub de investimentos seguros, atraindo capital estrangeiro através de segurança jurídica e estabilidade política.\n\nA educação e a cultura também estão no centro da guerra de narrativas. O movimento patriota investe em plataformas de formação que resgatam os valores tradicionais e combatem o doutrinamento. O conhecimento da nossa história real é a arma mais poderosa contra as tentativas de desconstrução da identidade nacional.\n\nConcluímos que a jornada rumo a 2026 exige vigilância constante. O Jornal Patriota continuará trazendo os bastidores que ninguém mais ousa mostrar, garantindo que você esteja sempre informado e preparado para os desafios que virão. A verdade é nossa maior aliada.",
+          full_content: "O cenário político brasileiro em Março de 2026 mostra que o legado econômico do governo Bolsonaro permanece como o principal ponto de referência para a oposição...",
           category: "INTELIGÊNCIA POLÍTICA",
           date: "23 de Março, 2026",
           author: "Redação Jornal Patriota",
@@ -173,7 +171,7 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
         {
           title: "Bastidores de Brasília: A Resistência Contra o Avanço do Autoritarismo",
           excerpt: "Relatório exclusivo sobre as manobras parlamentares para proteger a liberdade de expressão e os direitos fundamentais.",
-          full_content: "Nesta semana de Março de 2026, a tensão nos corredores do Congresso Nacional atingiu níveis críticos. A oposição patriota tem trabalhado incansavelmente para barrar projetos que visam aumentar o controle estatal sobre as redes sociais e a liberdade de imprensa independente. O Jornal Patriota teve acesso a documentos que mostram a estratégia de resistência.\n\nLideranças conservadoras estão formando um bloco sólido para garantir que a Constituição seja respeitada. A percepção é de que há uma tentativa coordenada de silenciar vozes dissonantes através de mecanismos burocráticos e interpretações jurídicas criativas. A união dos parlamentares é o que tem impedido retrocessos maiores.\n\nAlém da pauta da liberdade, a fiscalização dos gastos públicos tornou-se uma prioridade absoluta. A Central de Inteligência VIP monitora diariamente as licitações e contratos que apresentam indícios de irregularidades. O compromisso com a transparência é o que diferencia este portal da mídia oficial, que muitas vezes ignora esses fatos.\n\nA articulação para 2026 também passa pela formação de novas lideranças nos estados. O movimento está identificando nomes com ficha limpa e compromisso real com os valores da direita para disputar prefeituras e governos. A base está sendo construída de baixo para cima, garantindo uma estrutura robusta para o pleito nacional.\n\nO apoio popular continua sendo o combustível desse movimento. Mesmo sob pressão, as manifestações espontâneas mostram que o povo brasileiro não aceita mais ser conduzido por narrativas prontas. A busca pela verdade é um caminho sem volta, e a tecnologia é a ferramenta que permite essa conexão direta entre os representantes e os representados.\n\nNo setor econômico, a preocupação com o aumento da carga tributária é constante. O Jornal Patriota tem denunciado as tentativas de asfixiar o setor produtivo para sustentar o inchaço estatal. A defesa do livre mercado e da propriedade privada são os pilares que sustentam nossa análise e nossa luta diária.\n\nA segurança nacional e a proteção das nossas fronteiras também são temas de relatórios frequentes. O combate ao tráfico e à entrada de armas ilegeis exige uma postura firme e investimentos em inteligência, algo que a oposição tem cobrado sistematicamente no plenário.\n\nEste é um momento de definição. Aqueles que se mantiverem firmes nos princípios colherão os frutos de um Brasil livre e próspero. O Jornal Patriota é o seu escudo informativo nesta batalha, trazendo a luz da verdade para os cantos mais escuros da política brasiliense.",
+          full_content: "Nesta semana de Março de 2026, a tensão nos corredores do Congresso Nacional atingiu níveis críticos...",
           category: "BASTIDORES DO PODER",
           date: "22 de Março, 2026",
           author: "Análise VIP",
@@ -183,7 +181,7 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
         {
           title: "Mobilização Nacional: O Crescimento Orgânico do Movimento Conservador",
           excerpt: "Como as redes de apoio ao governo Bolsonaro estão se reorganizando para os desafios de 2026.",
-          full_content: "O fenômeno de mobilização que vimos nos últimos anos não arrefeceu; ele se transformou. Em Março de 2026, o movimento conservador brasileiro demonstra uma maturidade organizacional sem precedentes. Núcleos de apoio estão surgindo em cidades pequenas e médias, criando uma rede de proteção e disseminação de informações que a grande mídia não consegue controlar.\n\nO Jornal Patriota acompanhou reuniões regionais onde o foco principal é a educação política da base. Não se trata apenas de votar, mas de entender o processo legislativo e fiscalizar os representantes eleitos. Essa conscientização é o que garantirá que as pautas de família, liberdade e pátria sejam defendidas com propriedade em todas as esferas.\n\nA tecnologia de inteligência artificial, utilizada por este portal, permite que esses núcleos recebam análises precisas sobre o cenário nacional em tempo real. A informação é poder, e estamos democratizando esse poder para cada patriota que deseja ver o Brasil nos trilhos do progresso real.\n\nAs articulações para 2026 incluem um plano de comunicação agressivo para cobater as narrativas de desconstrução. O uso de canais diretos, como este Portal VIP e grupos de WhatsApp seguros, garante que a mensagem chegue ao destino final sem distorções. A verdade tem uma força própria que, quando bem comunicada, é imparável.\n\nO legado do governo Bolsonaro na infraestrutura é um dos temas mais discutidos nessas reuniões. As obras entregues e os projetos iniciados são provas concretas de que é possível gerir o país com eficiência e sem corrupção. O resgate desse orgulho nacional é o que une brasileiros de todas as regiões e classes sociais.\n\nA defesa dos valores cristãos continua sendo a base moral do movimento. A proteção da vida desde a concepção e o fortalecimento da família tradicional são pautas que ressoam com a maioria da população. O Jornal Patriota se orgulha de ser a voz que ecoa esses sentimentos, muitas vezes ridicularizados pela elite cultural.\n\nOlhando para o futuro, o desafio é manter a unidade. A oposição tentará criar divisões internas, mas o foco no objetivo maior — um Brasil livre e soberano — deve prevalecer. A estratégia de 'dividir para conquistar' só funciona se permitirmos. A união em torno de princípios claros é nossa maior fortaleza.\n\nFique atento aos nossos alertas diários. A Central de Inteligência está operando 24 horas por dia para garantir que você receba o que há de mais relevante e atual no cenário político. Juntos, somos a resistência e a esperança do Brasil.",
+          full_content: "O fenômeno de mobilização que vimos nos últimos anos não arrefeceu; ele se transformou...",
           category: "MOVIMENTO PATRIOTA",
           date: "21 de Março, 2026",
           author: "Equipe de Inteligência",
@@ -193,265 +191,291 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
       ]);
     } finally {
       setLoading(false);
-      console.log("Portal VIP: Processo de carregamento finalizado.");
     }
   };
 
   useEffect(() => {
-    console.log("Portal VIP: Componente montado, buscando notícias...");
     fetchWeeklyIntelligence();
   }, []);
 
-  useEffect(() => {
-    console.log("Portal VIP: Estado de notícias atualizado:", news.length, "itens.");
-  }, [news]);
-
   return (
-    <div className="bg-[#f1f5f9] min-h-screen">
+    <div className="bg-black min-h-screen text-white font-sans selection:bg-patriotic-yellow selection:text-black">
+      {/* Barra de Urgência Superior */}
+      <div className="bg-patriotic-yellow text-black py-2 px-4 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12 z-50 relative overflow-hidden">
+        <div className="flex items-center gap-2 font-black text-[10px] uppercase tracking-widest animate-pulse">
+          <AlertTriangle size={14} /> AVISO: ESTE CONTEÚDO PODE SER REMOVIDO A QUALQUER MOMENTO POR ORDEM JUDICIAL
+        </div>
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 text-xs font-black italic">
+            <Clock size={16} /> TEMPO RESTANTE DE ACESSO: <span className="bg-black text-patriotic-yellow px-2 py-0.5 rounded-sm tabular-nums">{formatTime(timeLeft)}</span>
+          </div>
+          <div className="hidden md:flex items-center gap-2 text-xs font-black">
+            <User size={16} /> <span className="text-black/70">{onlineUsers} PATRIOTAS CONECTADOS AGORA</span>
+          </div>
+        </div>
+      </div>
+
       {/* Botão Flutuante Mobile de WhatsApp */}
       <a 
         href={WHATSAPP_SUPPORT_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-[60] bg-[#25d366] text-white p-5 rounded-full shadow-[0_15px_40px_rgba(37,211,102,0.5)] hover:scale-110 active:scale-95 transition-all md:hidden flex items-center justify-center border-4 border-white"
+        className="fixed bottom-6 right-6 z-[60] bg-[#25d366] text-white p-5 rounded-full shadow-[0_15px_40px_rgba(37,211,102,0.5)] hover:scale-110 active:scale-95 transition-all md:hidden flex items-center justify-center border-2 border-white/20"
       >
         <MessageCircle size={32} />
       </a>
 
       {/* Header Fixo */}
-      <header className="bg-blue-900 text-white border-b-4 border-green-500 sticky top-0 z-40 shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-green-500 p-2 rounded-xl">
-                <ShieldAlert size={18} className="text-blue-900" />
+      <header className="bg-zinc-900/80 backdrop-blur-xl text-white border-b border-white/5 sticky top-0 z-40 shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="bg-patriotic-green p-2 rounded-sm shadow-[0_0_20px_rgba(0,155,58,0.3)]">
+                <ShieldAlert size={20} className="text-white" />
             </div>
-            <h1 className="text-base md:text-xl font-black tracking-tighter uppercase italic leading-none">
-              CENTRAL <span className="text-green-400">PATRIOTA</span> VIP
+            <h1 className="text-xl md:text-2xl font-black tracking-tighter uppercase italic leading-none">
+              CENTRAL <span className="text-patriotic-yellow">PATRIOTA</span> <span className="text-xs bg-white/10 px-2 py-1 rounded-sm ml-2 border border-white/10">VIP ACCESS</span>
             </h1>
           </div>
           <div className="flex items-center gap-4">
-             <div className="hidden md:flex items-center gap-2 text-[10px] font-bold text-blue-200 uppercase bg-blue-800/50 px-3 py-1.5 rounded-full border border-blue-700">
-                <Activity size={12} className="text-green-400 animate-pulse" /> Servidor: Ativo
+             <div className="hidden md:flex items-center gap-3 text-[10px] font-black text-zinc-400 uppercase bg-black/50 px-4 py-2 rounded-sm border border-white/5">
+                <Activity size={14} className="text-patriotic-green animate-pulse" /> STATUS: CRIPTOGRAFIA MILITAR ATIVA
              </div>
-            <button onClick={() => fetchWeeklyIntelligence()} className="p-2 bg-blue-800 rounded-lg text-blue-300 hover:text-white transition-colors">
-              <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
+            <button onClick={() => fetchWeeklyIntelligence()} className="p-2.5 bg-white/5 rounded-sm text-zinc-400 hover:text-white hover:bg-white/10 transition-all border border-white/5">
+              <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
             </button>
-            <button onClick={onLogout} className="p-2 bg-red-600/20 text-red-500 rounded-lg hover:bg-red-600 hover:text-white transition-all">
-              <LogOut size={18} />
+            <button onClick={onLogout} className="p-2.5 bg-red-950/30 text-red-500 rounded-sm hover:bg-red-600 hover:text-white transition-all border border-red-900/30">
+              <LogOut size={20} />
             </button>
           </div>
         </div>
       </header>
 
       {/* Grid Principal Layout 3 Colunas */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           
-          {/* COLUNA ESQUERDA: BRIEFING SEMANAL (FIXO) */}
-          <aside className="lg:col-span-3 lg:sticky lg:top-24">
-            <div className="bg-white rounded-[2rem] shadow-lg border border-slate-200 overflow-hidden">
-              <div className="bg-blue-950 p-6 text-white">
-                <div className="flex items-center gap-2 mb-1">
-                  <Cpu size={18} className="text-green-500 animate-pulse" />
-                  <h3 className="text-sm font-black uppercase italic tracking-tighter">ANÁLISE DE IA</h3>
+          {/* COLUNA ESQUERDA: BRIEFING E PROVA SOCIAL */}
+          <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-32">
+            {/* Briefing IA */}
+            <div className="bg-zinc-900 rounded-sm border border-white/5 overflow-hidden shadow-2xl">
+              <div className="bg-gradient-to-r from-patriotic-green to-black p-6 border-b border-white/5">
+                <div className="flex items-center gap-3 mb-1">
+                  <Cpu size={20} className="text-white animate-pulse" />
+                  <h3 className="text-sm font-black uppercase italic tracking-tighter">INTELIGÊNCIA ARTIFICIAL</h3>
                 </div>
-                <p className="text-[10px] text-blue-300 font-bold uppercase tracking-widest">Resumo Estratégico</p>
+                <p className="text-[10px] text-white/60 font-black uppercase tracking-widest">RELATÓRIO ESTRATÉGICO</p>
               </div>
-              <div className="p-6">
+              <div className="p-8">
                 {loading ? (
-                  <div className="space-y-3">
-                    <div className="h-3 bg-slate-100 rounded animate-pulse"></div>
-                    <div className="h-3 bg-slate-100 rounded w-5/6 animate-pulse"></div>
+                  <div className="space-y-4">
+                    <div className="h-2 bg-white/5 rounded animate-pulse"></div>
+                    <div className="h-2 bg-white/5 rounded w-5/6 animate-pulse"></div>
+                    <div className="h-2 bg-white/5 rounded w-4/6 animate-pulse"></div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {briefing.split('\n').filter(p => p.trim() !== '').map((p, i) => (
-                      <p key={i} className="text-slate-600 text-[11px] leading-relaxed font-medium italic border-l-4 border-green-500 pl-4 py-1">
+                      <p key={i} className="text-zinc-400 text-[11px] leading-relaxed font-bold italic border-l-2 border-patriotic-green pl-4 py-1">
                         "{p}"
                       </p>
                     ))}
                   </div>
                 )}
-                <div className="mt-6 pt-6 border-t border-slate-100 flex items-center justify-between">
-                   <span className="text-[9px] font-black text-slate-400 uppercase">Sincronizado</span>
-                   <Lock size={12} className="text-slate-300" />
-                </div>
               </div>
             </div>
           </aside>
 
           {/* COLUNA CENTRAL: MATÉRIAS DETALHADAS */}
-          <main className="lg:col-span-6 space-y-10">
-            <div className="flex items-center gap-2 mb-4 text-blue-950">
-              <TrendingUp size={24} className="text-green-600" />
-              <h2 className="text-2xl font-black uppercase italic tracking-tighter">RELATÓRIOS EM TEMPO REAL</h2>
+          <main className="lg:col-span-6 space-y-12">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3 text-white">
+                <TrendingUp size={28} className="text-patriotic-green" />
+                <h2 className="text-3xl font-black uppercase italic tracking-tighter">ARQUIVOS SECRETOS</h2>
+              </div>
+              <div className="text-[10px] font-black text-zinc-600 uppercase tracking-widest flex items-center gap-2">
+                <Database size={14} /> ATUALIZADO EM TEMPO REAL
+              </div>
             </div>
 
-            <div className="space-y-12">
+            <div className="space-y-16">
               {loading ? (
                 [1, 2, 3].map(i => (
-                  <div key={i} className="bg-white rounded-[2.5rem] h-[400px] animate-pulse shadow-sm border border-slate-200"></div>
+                  <div key={i} className="bg-zinc-900 rounded-sm h-[450px] animate-pulse border border-white/5"></div>
                 ))
               ) : news.length > 0 ? (
                 news.map((item, index) => (
-                  <article key={index} className="bg-white rounded-[2.5rem] shadow-md hover:shadow-2xl transition-all border border-slate-100 overflow-hidden group">
-                    <div className="relative h-72 overflow-hidden">
-                      <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]" />
-                      <div className="absolute top-6 left-6 bg-blue-600 text-white text-[10px] font-black px-4 py-2 rounded-full uppercase shadow-xl z-10">
+                  <article key={index} className="bg-zinc-900 rounded-sm shadow-2xl hover:border-patriotic-yellow/30 transition-all duration-500 border border-white/5 overflow-hidden group">
+                    <div className="relative h-80 overflow-hidden">
+                      <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms] grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100" />
+                      <div className="absolute top-8 left-8 bg-black/80 backdrop-blur-md text-white text-[10px] font-black px-6 py-2 rounded-sm uppercase border border-white/10 z-10 tracking-widest">
                         {item.category}
                       </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
-                      <div className="absolute bottom-8 left-10 right-10 z-10">
-                         <div className="flex items-center gap-3 text-[11px] font-bold text-blue-200 uppercase mb-3">
-                            <span className="flex items-center gap-1.5"><User size={12} className="text-green-400" /> {item.author}</span>
-                            <span className="flex items-center gap-1.5"><Clock size={12} className="text-blue-400" /> {item.date}</span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                      <div className="absolute bottom-10 left-10 right-10 z-10">
+                         <div className="flex items-center gap-4 text-[10px] font-black text-zinc-400 uppercase mb-4 tracking-widest">
+                            <span className="flex items-center gap-2"><User size={14} className="text-patriotic-green" /> {item.author}</span>
+                            <span className="flex items-center gap-2"><Clock size={14} className="text-patriotic-yellow" /> {item.date}</span>
                          </div>
-                         <h2 className="text-2xl md:text-3xl font-black text-white leading-tight uppercase italic tracking-tighter group-hover:text-green-400 transition-colors duration-300">
+                         <h2 className="text-3xl md:text-4xl font-black text-white leading-tight uppercase italic tracking-tighter group-hover:text-patriotic-yellow transition-colors duration-300">
                             {item.title}
                          </h2>
                       </div>
                     </div>
                     <div className="p-10">
-                      <p className="text-slate-600 text-base leading-relaxed mb-10 line-clamp-3 italic font-medium">
+                      <p className="text-zinc-400 text-base leading-relaxed mb-10 line-clamp-3 italic font-bold">
                         "{item.excerpt}"
                       </p>
-                      <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex flex-col sm:flex-row gap-6">
                         <button 
                           onClick={() => setSelectedArticle(item)}
-                          className="flex-[2] bg-blue-600 text-white font-black text-sm py-5 rounded-2xl hover:bg-blue-700 active:scale-95 transition-all uppercase italic tracking-tighter shadow-2xl shadow-blue-100"
+                          className="flex-[2] bg-white/5 text-white border border-white/10 font-black text-sm py-6 rounded-sm hover:bg-white hover:text-black active:scale-95 transition-all uppercase italic tracking-tighter"
                         >
-                          Ler Matéria VIP Completa
+                          DESBLOQUEAR RELATÓRIO COMPLETO
                         </button>
                         <a 
                           href={item.sourceUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="flex-1 p-5 bg-slate-50 text-slate-400 rounded-2xl hover:bg-green-500 hover:text-white transition-all border border-slate-200 flex items-center justify-center gap-2 font-black text-[10px] uppercase italic tracking-widest"
+                          className="flex-1 p-6 bg-black text-zinc-600 rounded-sm hover:bg-patriotic-yellow hover:text-black transition-all border border-white/5 flex items-center justify-center gap-3 font-black text-[10px] uppercase italic tracking-widest"
                         >
-                          FONTE <ExternalLink size={18} />
+                          FONTE <ExternalLink size={20} />
                         </a>
                       </div>
                     </div>
                   </article>
                 ))
               ) : (
-                <div className="bg-white rounded-[2.5rem] p-20 text-center border-2 border-dashed border-slate-200">
-                   <AlertTriangle size={48} className="text-slate-300 mx-auto mb-4" />
-                   <p className="text-slate-500 font-bold uppercase tracking-widest">Nenhuma notícia disponível no momento.</p>
-                   <button onClick={() => fetchWeeklyIntelligence()} className="mt-6 px-8 py-3 bg-blue-600 text-white rounded-xl font-black uppercase italic tracking-tighter hover:bg-blue-700 transition-all">
-                      Tentar Sincronizar Novamente
+                <div className="bg-zinc-900 rounded-sm p-24 text-center border border-white/5">
+                   <AlertTriangle size={64} className="text-zinc-800 mx-auto mb-6" />
+                   <p className="text-zinc-500 font-black uppercase tracking-widest text-sm">SISTEMA TEMPORARIAMENTE INDISPONÍVEL</p>
+                   <button onClick={() => fetchWeeklyIntelligence()} className="mt-8 px-10 py-4 bg-patriotic-yellow text-black rounded-sm font-black uppercase italic tracking-tighter hover:bg-white transition-all">
+                      RECONECTAR AO SERVIDOR
                    </button>
                 </div>
               )}
             </div>
             
-            <div className="text-center py-10 opacity-30 border-t border-slate-200">
-               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Criptografia de Ponta-a-Ponta Ativa</p>
+            <div className="text-center py-16 opacity-20 border-t border-white/5">
+               <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.5em]">PROTOCOLO DE SEGURANÇA NACIONAL ATIVO</p>
             </div>
           </main>
 
-          {/* COLUNA DIREITA: MONITORAMENTO E SUPORTE (ESTÁTICO/FIXO) */}
-          <aside className="lg:col-span-3 lg:sticky lg:top-24">
-            <div className="space-y-6">
-              {/* Card Monitoramento */}
-              <div className="bg-white rounded-[2rem] shadow-lg border border-slate-200 overflow-hidden">
-                <div className="p-8 text-center">
-                  <div className="inline-flex p-4 bg-green-50 rounded-full mb-4">
-                    <ShieldCheck size={40} className="text-green-600 animate-pulse" />
-                  </div>
-                  <h4 className="text-sm font-black text-blue-950 uppercase italic tracking-tighter mb-2">PÁGINA MONITORADA</h4>
-                  <p className="text-[11px] text-slate-500 font-bold leading-relaxed px-2 mb-4">
-                    Protocolo de segurança patriota ativado. Interações 100% privadas.
-                  </p>
-                  <div className="bg-red-50 p-5 rounded-2xl border-2 border-red-100 mb-6 text-left">
-                    <div className="flex items-center gap-2 mb-3">
-                      <AlertTriangle size={18} className="text-red-600" />
-                      <p className="text-[10px] text-red-600 font-black uppercase tracking-tight">ANTI-VAZAMENTO</p>
-                    </div>
-                    <p className="text-[10px] text-red-700 font-black leading-tight uppercase">
-                      Vazamentos ou prints resultam em BANIMENTO IMEDIATO da sua conta VIP.
-                    </p>
-                  </div>
+          {/* COLUNA DIREITA: MONITORAMENTO E ESCASSEZ */}
+          <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-32">
+            {/* Card Monitoramento Agressivo */}
+            <div className="bg-zinc-900 rounded-sm border border-white/5 overflow-hidden shadow-2xl">
+              <div className="p-8 text-center">
+                <div className="inline-flex p-5 bg-red-950/20 rounded-full mb-6 border border-red-900/30">
+                  <ShieldCheck size={48} className="text-red-500 animate-pulse" />
                 </div>
-                <div className="bg-slate-900 px-6 py-4 flex items-center justify-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
-                  <span className="text-[9px] font-black text-white uppercase tracking-widest">SISTEMA SEGURO</span>
+                <h4 className="text-sm font-black text-white uppercase italic tracking-tighter mb-4">ACESSO MONITORADO</h4>
+                <p className="text-[11px] text-zinc-500 font-bold leading-relaxed mb-6">
+                  Seu IP está sendo registrado. Qualquer tentativa de compartilhamento resultará em <span className="text-red-500">BANIMENTO PERMANENTE</span>.
+                </p>
+                <div className="bg-black p-6 rounded-sm border border-red-900/30 mb-6 text-left">
+                  <div className="flex items-center gap-3 mb-4">
+                    <AlertTriangle size={20} className="text-red-500" />
+                    <p className="text-[10px] text-red-500 font-black uppercase tracking-widest">ALERTA DE REMOÇÃO</p>
+                  </div>
+                  <p className="text-[10px] text-zinc-400 font-black leading-relaxed uppercase italic">
+                    ESTE PORTAL PODE SER DERRUBADO A QUALQUER MOMENTO. SALVE AS INFORMAÇÕES IMPORTANTES ENQUANTO HÁ TEMPO.
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-3 text-[9px] font-black text-patriotic-green uppercase tracking-widest">
+                  <div className="w-2 h-2 bg-patriotic-green rounded-full animate-ping"></div>
+                  CONEXÃO SEGURA ESTABELECIDA
                 </div>
               </div>
+            </div>
 
-              {/* Card Suporte VIP 24H (Sticky no scroll) */}
-              <div className="bg-blue-600 bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group border border-white/10">
-                <div className="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-125 transition-transform duration-1000">
-                  <Flag size={140} />
-                </div>
-                <h4 className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter mb-6 leading-none">SUPORTE VIP 24H</h4>
-                <p className="text-sm text-blue-100 font-medium mb-10 leading-relaxed">
-                  Dúvidas sobre o conteúdo ou acesso? Fale agora com nossa central exclusiva via WhatsApp.
+            {/* Card Escassez / Suporte */}
+            <div className="bg-gradient-to-br from-patriotic-green to-black rounded-sm p-10 text-white shadow-2xl relative overflow-hidden group border border-white/10">
+              <div className="absolute -right-10 -bottom-10 opacity-5 group-hover:scale-125 transition-transform duration-1000">
+                <Flag size={200} />
+              </div>
+              <div className="relative z-10">
+                <h4 className="text-2xl font-black uppercase italic tracking-tighter mb-4 leading-none">SUPORTE TÁTICO</h4>
+                <p className="text-xs text-white/70 font-bold mb-10 leading-relaxed uppercase tracking-wide">
+                  Dificuldades técnicas ou dúvidas sobre os relatórios? Nossa equipe está de prontidão.
                 </p>
                 <a 
                   href={WHATSAPP_SUPPORT_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-6 bg-white text-blue-800 font-black rounded-[1.8rem] text-sm uppercase italic tracking-tighter hover:bg-green-500 hover:text-white transition-all flex items-center justify-center gap-4 shadow-[0_20px_40px_rgba(0,0,0,0.3)] active:scale-95 border-2 border-white/50"
+                  className="w-full py-6 bg-white text-black font-black rounded-sm text-sm uppercase italic tracking-tighter hover:bg-patriotic-yellow transition-all flex items-center justify-center gap-4 shadow-2xl active:scale-95"
                 >
-                  <MessageCircle size={28} /> SUPORTE WHATSAPP
+                  <MessageCircle size={28} /> ACIONAR WHATSAPP
                 </a>
               </div>
+            </div>
+
+            {/* Contador de Vagas (Escassez) */}
+            <div className="bg-zinc-900 rounded-sm p-8 border border-white/5 text-center">
+              <h5 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">DISPONIBILIDADE HOJE</h5>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="h-2 w-full bg-black rounded-full overflow-hidden flex-grow">
+                  <div className="h-full bg-red-600" style={{ width: '12%' }}></div>
+                </div>
+                <span className="text-red-500 font-black text-xs">12%</span>
+              </div>
+              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-tight">
+                APENAS <span className="text-white">14 VAGAS</span> RESTANTES PARA O PLANO VITALÍCIO.
+              </p>
             </div>
           </aside>
 
         </div>
       </div>
 
-      {/* Modal de Matéria Completa (Fundo Blur Forte) */}
+      {/* Modal de Matéria Completa */}
       {selectedArticle && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-blue-950/95 backdrop-blur-2xl overflow-y-auto">
-          <div className="bg-white w-full max-w-4xl min-h-fit rounded-[4rem] shadow-2xl overflow-hidden flex flex-col my-auto border border-white/10">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/95 backdrop-blur-2xl overflow-y-auto">
+          <div className="bg-zinc-900 w-full max-w-4xl min-h-fit rounded-sm shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden flex flex-col my-auto border border-white/10">
             <div className="relative h-80 sm:h-96 shrink-0">
-              <img src={selectedArticle.imageUrl} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/60"></div>
+              <img src={selectedArticle.imageUrl} className="w-full h-full object-cover grayscale opacity-40" />
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-black/80"></div>
               <button 
                 onClick={() => setSelectedArticle(null)} 
-                className="absolute top-10 right-10 w-16 h-16 bg-white/20 backdrop-blur-2xl hover:bg-white text-white hover:text-blue-900 rounded-full flex items-center justify-center transition-all z-20 shadow-2xl border border-white/20"
+                className="absolute top-10 right-10 w-16 h-16 bg-white/5 backdrop-blur-xl hover:bg-white text-white hover:text-black rounded-full flex items-center justify-center transition-all z-20 shadow-2xl border border-white/10"
               >
                 <X size={32} strokeWidth={3} />
               </button>
               <div className="absolute bottom-12 left-14 z-10">
-                <span className="bg-blue-600 text-white text-[11px] font-black px-8 py-3 rounded-full uppercase tracking-widest shadow-2xl">{selectedArticle.category}</span>
+                <span className="bg-patriotic-green text-white text-[10px] font-black px-8 py-3 rounded-sm uppercase tracking-widest border border-white/10">{selectedArticle.category}</span>
               </div>
             </div>
             
             <div className="p-10 md:p-20">
-              <div className="flex flex-wrap items-center gap-6 text-slate-400 text-[12px] font-black uppercase mb-12 border-b border-slate-100 pb-10">
-                <span className="flex items-center gap-3 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl"><User size={16} /> FONTE: {selectedArticle.author}</span>
-                <span className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl"><Clock size={16} /> {selectedArticle.date}</span>
-                <span className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl">ID: VIP-{Math.floor(Math.random()*9000)+1000}</span>
+              <div className="flex flex-wrap items-center gap-8 text-zinc-500 text-[10px] font-black uppercase mb-12 border-b border-white/5 pb-12 tracking-widest">
+                <span className="flex items-center gap-3 text-white"><User size={18} className="text-patriotic-green" /> FONTE: {selectedArticle.author}</span>
+                <span className="flex items-center gap-3"><Clock size={18} className="text-patriotic-yellow" /> {selectedArticle.date}</span>
+                <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-sm">ID: VIP-{Math.floor(Math.random()*9000)+1000}</span>
               </div>
               
-              <h2 className="text-3xl md:text-5xl font-black text-blue-950 mb-12 leading-none italic tracking-tighter">{selectedArticle.title}</h2>
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-12 leading-none italic tracking-tighter uppercase">{selectedArticle.title}</h2>
               
-              <div className="space-y-10 text-slate-700 text-xl md:text-2xl leading-relaxed font-medium">
+              <div className="space-y-10 text-zinc-400 text-xl md:text-2xl leading-relaxed font-bold italic">
                 {selectedArticle.full_content.split('\n').filter(p => p.trim() !== '').map((para, i) => (
-                  <p key={i} className="mb-4">{para}</p>
+                  <p key={i} className="mb-4">"{para}"</p>
                 ))}
               </div>
 
-              <div className="mt-20 pt-16 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-10">
+              <div className="mt-20 pt-16 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-10">
                 <button 
                   onClick={() => setSelectedArticle(null)} 
-                  className="text-slate-400 font-black text-base hover:text-blue-600 flex items-center gap-3 transition-colors uppercase italic tracking-widest"
+                  className="text-zinc-600 font-black text-sm hover:text-white flex items-center gap-4 transition-colors uppercase italic tracking-widest"
                 >
                   <ChevronRight size={24} className="rotate-180" /> VOLTAR AO PAINEL
                 </button>
                 <div className="flex gap-6 w-full md:w-auto">
-                   <button className="flex-1 md:flex-none p-6 bg-slate-50 text-slate-400 rounded-[2rem] hover:bg-blue-50 hover:text-blue-600 transition-colors shadow-sm">
+                   <button className="flex-1 md:flex-none p-6 bg-white/5 text-zinc-400 rounded-sm hover:bg-white hover:text-black transition-all border border-white/10">
                     <Share2 size={32} />
                   </button>
                   <a 
                     href={selectedArticle.sourceUrl} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="flex-[3] md:flex-none flex items-center justify-center gap-4 bg-green-500 text-white px-14 py-7 rounded-[2rem] font-black text-sm uppercase tracking-tighter italic hover:bg-green-600 transition-all shadow-2xl shadow-green-100"
+                    className="flex-[3] md:flex-none flex items-center justify-center gap-4 bg-patriotic-yellow text-black px-14 py-7 rounded-sm font-black text-sm uppercase tracking-tighter italic hover:bg-white transition-all shadow-2xl"
                   >
                     ABRIR FONTE ORIGINAL <ExternalLink size={20} />
                   </a>

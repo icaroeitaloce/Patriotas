@@ -4,47 +4,63 @@ import { Flag, Twitter, Instagram, Facebook, Youtube } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-blue-950 text-white py-16 px-4">
+    <footer className="bg-black text-white py-24 px-4 border-t border-white/5">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
-          <div className="col-span-2">
-            <div className="flex items-center gap-2 mb-6">
-              <Flag className="text-green-500 w-8 h-8" />
-              <span className="text-2xl font-black italic tracking-tighter uppercase">Jornal Patriota</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
+          <div className="lg:col-span-1">
+            <div className="flex items-center gap-2 mb-8">
+              <span className="text-3xl font-black italic tracking-tighter uppercase">
+                JORNAL <span className="text-patriotic-green">PATRIOTA</span>
+              </span>
             </div>
-            <p className="text-blue-200 text-lg max-w-md leading-relaxed">
-              A voz da direita brasileira. 
-              Compromisso com a verdade, a família e a liberdade.
+            <p className="text-zinc-500 text-lg font-medium leading-relaxed">
+              A última linha de defesa da informação livre e soberana no Brasil.
             </p>
           </div>
 
           <div>
-            <h4 className="font-bold text-xl mb-6 text-green-500">Links Úteis</h4>
-            <ul className="space-y-4 text-blue-100">
-              <li><a href="#" className="hover:text-white transition-colors">Sobre o Movimento</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Como Doar</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Agenda de Eventos</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Material Digital</a></li>
+            <h4 className="font-black text-xs uppercase tracking-[0.3em] mb-8 text-patriotic-yellow">Navegação</h4>
+            <ul className="space-y-4">
+              {['Início', 'Notícias', 'Portal VIP', 'Sobre Nós'].map((item) => (
+                <li key={item}>
+                  <a href="#" className="text-zinc-400 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest">{item}</a>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-xl mb-6 text-green-500">Redes Sociais</h4>
+            <h4 className="font-black text-xs uppercase tracking-[0.3em] mb-8 text-patriotic-yellow">Legal</h4>
+            <ul className="space-y-4">
+              {['Termos de Uso', 'Privacidade', 'Cookies', 'Contato'].map((item) => (
+                <li key={item}>
+                  <a href="#" className="text-zinc-400 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest">{item}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-black text-xs uppercase tracking-[0.3em] mb-8 text-patriotic-yellow">Redes Sociais</h4>
             <div className="flex gap-4">
-              <a href="#" className="p-3 bg-blue-900 rounded-full hover:bg-green-600 transition-colors"><Instagram size={24} /></a>
-              <a href="#" className="p-3 bg-blue-900 rounded-full hover:bg-green-600 transition-colors"><Twitter size={24} /></a>
-              <a href="#" className="p-3 bg-blue-900 rounded-full hover:bg-green-600 transition-colors"><Facebook size={24} /></a>
-              <a href="#" className="p-3 bg-blue-900 rounded-full hover:bg-green-600 transition-colors"><Youtube size={24} /></a>
+              {[Twitter, Facebook, Instagram, Youtube].map((Icon, i) => (
+                <a 
+                  key={i} 
+                  href="#" 
+                  className="w-12 h-12 bg-white/5 rounded-sm flex items-center justify-center text-zinc-400 hover:bg-patriotic-green hover:text-white transition-all border border-white/5"
+                >
+                  <Icon size={20} />
+                </a>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-blue-900 flex flex-col md:row justify-between items-center gap-4 text-sm text-blue-300">
-          <p>© 2026 Jornal Patriota. Todos os direitos reservados.</p>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-white">Política de Privacidade</a>
-            <a href="#" className="hover:text-white">Termos de Uso</a>
-          </div>
+        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600">
+          <p>© 2026 JORNAL PATRIOTA. TODOS OS DIREITOS RESERVADOS.</p>
+          <p className="flex items-center gap-2">
+            <Flag size={12} className="text-patriotic-green" /> CONTEÚDO PROTEGIDO
+          </p>
         </div>
       </div>
     </footer>
