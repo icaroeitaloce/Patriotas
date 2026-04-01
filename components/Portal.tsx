@@ -74,14 +74,17 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-  
-  const fetchWeeklyIntelligence = async () => {
+  };  const fetchWeeklyIntelligence = async () => {
     setLoading(true);
     setError(null);
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey || apiKey === "undefined") throw new Error("Configuração de API ausente");
+      // Usando verificação segura para process.env
+      const apiKey = typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined;
+      
+      if (!apiKey || apiKey === "undefined") {
+        console.error("API Key is missing");
+        throw new Error("Chave da API não configurada. Verifique as configurações do ambiente.");
+      }
 
       const ai = new GoogleGenAI({ apiKey });
       const today = new Date().toLocaleDateString('pt-BR');
@@ -135,13 +138,19 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
       });
 
       const rawText = response.text || "";
+      if (!rawText) throw new Error("A IA retornou uma resposta vazia.");
+
       let data: IntelligenceData;
       try {
         data = JSON.parse(rawText);
       } catch (e) {
         const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) data = JSON.parse(jsonMatch[0]);
-        else throw new Error("Falha ao processar JSON da IA");
+        if (jsonMatch) {
+          data = JSON.parse(jsonMatch[0]);
+        } else {
+          console.error("Failed to parse JSON:", rawText);
+          throw new Error("Falha ao processar os dados da inteligência.");
+        }
       }
       
       if (data.articles && data.articles.length > 0) {
@@ -152,16 +161,20 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
         setNews(processedNews);
         setBriefing(data.weekly_briefing);
       } else {
-        throw new Error("IA retornou dados vazios");
+        throw new Error("Nenhum artigo foi retornado pela inteligência.");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro desconhecido");
+      const errorMessage = err instanceof Error ? err.message : "Erro na conexão com a Central de Inteligência";
+      setError(errorMessage);
+      console.error("Portal Error:", err);
+      
+      // FALLBACK SEMPRE ATIVO EM CASO DE QUALQUER ERRO
       setBriefing("O monitoramento do Jornal Patriota detectou movimentações intensas em Brasília nesta semana. As articulações para 2026 entraram em uma fase decisiva, com foco na unificação da base conservadora e na fiscalização rigorosa das políticas atuais.");
       setNews([
         {
           title: "Balanço Estratégico: O Legado Econômico e os Novos Rumos para 2026",
           excerpt: "Análise profunda sobre como as políticas de liberdade econômica do governo Bolsonaro continuam influenciando o debate nacional.",
-          full_content: "O cenário político brasileiro em Março de 2026 mostra que o legado econômico do governo Bolsonaro permanece como o principal ponto de referência para a oposição...",
+          full_content: "O cenário político brasileiro em Março de 2026 mostra que o legado econômico do governo Bolsonaro permanece como o principal ponto de referência para a oposição. Dados recentes indicam que a base conservadora está se consolidando em torno de pautas de austeridade e redução da máquina pública, preparando o terreno para uma campanha focada em resultados práticos e liberdade individual.",
           category: "INTELIGÊNCIA POLÍTICA",
           date: "23 de Março, 2026",
           author: "Redação Jornal Patriota",
@@ -171,7 +184,7 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
         {
           title: "Bastidores de Brasília: A Resistência Contra o Avanço do Autoritarismo",
           excerpt: "Relatório exclusivo sobre as manobras parlamentares para proteger a liberdade de expressão e os direitos fundamentais.",
-          full_content: "Nesta semana de Março de 2026, a tensão nos corredores do Congresso Nacional atingiu níveis críticos...",
+          full_content: "Nesta semana de Março de 2026, a tensão nos corredores do Congresso Nacional atingiu níveis críticos. Parlamentares da ala conservadora intensificaram a fiscalização sobre decretos que podem limitar a liberdade de imprensa e de expressão nas redes sociais. O movimento 'Brasil Livre' ganha força com o apoio de juristas renomados que alertam para os riscos de retrocessos democráticos.",
           category: "BASTIDORES DO PODER",
           date: "22 de Março, 2026",
           author: "Análise VIP",
@@ -181,7 +194,7 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
         {
           title: "Mobilização Nacional: O Crescimento Orgânico do Movimento Conservador",
           excerpt: "Como as redes de apoio ao governo Bolsonaro estão se reorganizando para os desafios de 2026.",
-          full_content: "O fenômeno de mobilização que vimos nos últimos anos não arrefeceu; ele se transformou...",
+          full_content: "O fenômeno de mobilização que vimos nos últimos anos não arrefeceu; ele se transformou em uma rede capilarizada de núcleos de estudo e ação política. Em todo o país, eventos de formação de novas lideranças estão batendo recordes de público, demonstrando que a direita brasileira amadureceu e está pronta para uma disputa institucional sem precedentes no próximo pleito.",
           category: "MOVIMENTO PATRIOTA",
           date: "21 de Março, 2026",
           author: "Equipe de Inteligência",
@@ -345,11 +358,16 @@ export const Portal: React.FC<PortalProps> = ({ onLogout }) => {
                   </article>
                 ))
               ) : (
-                <div className="bg-zinc-900 rounded-sm p-24 text-center border border-white/5">
-                   <AlertTriangle size={64} className="text-zinc-800 mx-auto mb-6" />
-                   <p className="text-zinc-500 font-black uppercase tracking-widest text-sm">SISTEMA TEMPORARIAMENTE INDISPONÍVEL</p>
-                   <button onClick={() => fetchWeeklyIntelligence()} className="mt-8 px-10 py-4 bg-patriotic-yellow text-black rounded-sm font-black uppercase italic tracking-tighter hover:bg-white transition-all">
-                      RECONECTAR AO SERVIDOR
+                <div className="bg-zinc-900 rounded-sm p-12 md:p-24 text-center border border-white/5">
+                   <AlertTriangle size={64} className="text-red-500 mx-auto mb-6" />
+                   <p className="text-white font-black uppercase tracking-widest text-sm mb-2">SISTEMA TEMPORARIAMENTE INDISPONÍVEL</p>
+                   {error && (
+                     <p className="text-zinc-500 text-xs font-bold mb-8 max-w-md mx-auto">
+                       DETALHES DO ERRO: {error}
+                     </p>
+                   )}
+                   <button onClick={() => fetchWeeklyIntelligence()} className="px-10 py-4 bg-patriotic-yellow text-black rounded-sm font-black uppercase italic tracking-tighter hover:bg-white transition-all flex items-center gap-3 mx-auto">
+                      <RefreshCw size={20} /> RECONECTAR AO SERVIDOR
                    </button>
                 </div>
               )}
